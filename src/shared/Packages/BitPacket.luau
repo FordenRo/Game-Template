@@ -101,7 +101,7 @@ function BitPacket.Packet(items: {
 		end
 		table.insert(mapped, { k, v })
 	end
-	table.sort(function(a, b) return a[1] < b[1] end)
+	table.sort(mapped, function(a, b) return a[1] < b[1] end)
 
 	return BitPacket.new(function(bb, t)
 		for _, v in mapped do

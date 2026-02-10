@@ -14,19 +14,20 @@ local HEX = "0123456789ABCDEF"
 local BitBuffer = { change = {} }
 BitBuffer.extends = Class
 
-BitBuffer.Sym = {
-	HEX = HEX,
-	UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-	LOWER = "abcdefghijklmnopqrstuvwxyz",
-	ALPHA = BitBuffer.Sym.UPPER .. BitBuffer.Sym.LOWER,
-	DIGIT = "0123456789",
-	XDIGIT = BitBuffer.Sym.DIGIT .. "ABCDEFabcdef",
-	ALNUM = BitBuffer.Sym.ALPHA .. BitBuffer.Sym.DIGIT,
-	PUNCT = "-!\"#$%&'()*+,./:;<=>?@[\\]_`{|}~",
-	BLANK = " \t",
-	SPACE = BitBuffer.Sym.BLANK .. "\v\r\n\f",
-	PRINT = BitBuffer.Sym.ALNUM .. BitBuffer.Sym.PUNCT .. BitBuffer.Sym.SPACE,
-}
+BitBuffer.Sym = {}
+BitBuffer.Sym.HEX = HEX
+BitBuffer.Sym.UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+BitBuffer.Sym.LOWER = "abcdefghijklmnopqrstuvwxyz"
+BitBuffer.Sym.ALPHA = BitBuffer.Sym.UPPER .. BitBuffer.Sym.LOWER
+BitBuffer.Sym.DIGIT = "0123456789"
+BitBuffer.Sym.XDIGIT = BitBuffer.Sym.DIGIT .. "ABCDEFabcdef"
+BitBuffer.Sym.ALNUM = BitBuffer.Sym.ALPHA .. BitBuffer.Sym.DIGIT
+BitBuffer.Sym.PUNCT = "-!\"#$%&'()*+,./:;<=>?@[\\]_`{|}~"
+BitBuffer.Sym.BLANK = " \t"
+BitBuffer.Sym.SPACE = BitBuffer.Sym.BLANK .. "\v\r\n\f"
+BitBuffer.Sym.PRINT = BitBuffer.Sym.ALNUM
+	.. BitBuffer.Sym.PUNCT
+	.. BitBuffer.Sym.SPACE
 
 export type BitBuffer = {
 	--- Current size in bits.
