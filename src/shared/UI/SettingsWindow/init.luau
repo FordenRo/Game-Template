@@ -3,48 +3,16 @@ local TweenService = game:GetService("TweenService")
 
 local Array = require("../Packages/Array")
 local Component = require("../Packages/Component")
-local Flag = require("@self/Types/Flag")
 local Group = require("@self/Types/Group")
-local Number = require("@self/Types/Number")
-local Option = require("@self/Types/Option")
 local SettingTypes = require("../Services/SettingsService/SettingTypes")
 local SettingsConfig = require("../SettingsConfig")
 local SettingsService = require("../Services/SettingsService")
-local Slider = require("@self/Types/Slider")
+local TabButton = require("@self/TabButton")
 local Trove = require("../Packages/Trove")
 
-local Types = { Flag = Flag, Slider = Slider, Number = Number, Option = Option }
-
-local TabButton = { change = {} }
-TabButton.extends = Component
-
-type TabButton = {
-	Selected: boolean,
-	Activated: RBXScriptSignal,
-} & Component.Component<{ UIStroke: UIStroke } & TextButton>
-
-function TabButton.new(tab: SettingTypes.Tab): TabButton
-	local self: TabButton =
-		Component(ReplicatedStorage.UI.Settings.TabButton:Clone(), TabButton)
-
-	self.Instance.Text = tab.Title
-	self.Instance.LayoutOrder = tab.Index
-	self.Activated = self.Instance.Activated
-
-	return self
-end
-
-function TabButton.change.Selected(self: TabButton)
-	self.Instance.Interactable = not self.Selected
-
-	local tweenInfo = TweenInfo.new(0.2)
-	TweenService:Create(self.Instance, tweenInfo, {
-		BackgroundColor3 = self.Selected and Color3.fromRGB(90, 110, 130)
-			or Color3.fromRGB(60, 70, 80),
-	}):Play()
-	TweenService:Create(self.Instance.UIStroke, tweenInfo, {
-		Transparency = self.Selected and 0.4 or 0.8,
-	}):Play()
+local Types = {}
+for _, v in script.Types:GetChildren() do
+	if v:IsA("ModuleScript") then Types[v.Name] = require(v) end
 end
 
 local SettingsWindow = { change = {} }
@@ -74,7 +42,7 @@ type BaseSettingType = {
 type Self = {
 	trove: Trove.Trove,
 	tabContents: { [SettingTypes.Tab]: Frame },
-	tabButtons: { [SettingTypes.Tab]: TabButton },
+	tabButtons: { [SettingTypes.Tab]: TabButton.TabButton },
 	lastTab: SettingTypes.Tab,
 	settings: { [BaseSettingType]: { Value: any } & Component.Component<Frame> },
 	groups: { [SettingTypes.Group]: Group.Group },
