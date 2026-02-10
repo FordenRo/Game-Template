@@ -1,10 +1,3 @@
---[[
-	Class framework
-
-	Written by: FordenRo
-	Version: 1.0.0
-]]
-
 --!native
 local Signal = require("./Signal")
 

@@ -1,9 +1,3 @@
---[[
-	Client-side loader
-
-	Written by: FordenRo
-	Version: 1.0.0
-]]
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 if not game:IsLoaded() then game.Loaded:Wait() end

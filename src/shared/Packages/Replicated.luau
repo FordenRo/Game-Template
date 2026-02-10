@@ -1,10 +1,3 @@
---[[
-    Replicated interface
-
-    Written by: FordenRo
-    Version: 1.0.0
-]]
-
 --!native
 local RunService = game:GetService("RunService")
 

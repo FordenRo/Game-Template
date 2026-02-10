@@ -1,10 +1,3 @@
---[[
-	BitPacket library module
-
-	Written by: FordenRo
-	Version: 1.0.0
-]]
-
 --!native
 local BitBuffer = require("./BitBuffer")
 local Class = require("./Class")

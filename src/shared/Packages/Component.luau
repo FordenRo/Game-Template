@@ -1,10 +1,3 @@
---[[
-	Component framework
-
-	Written by: FordenRo
-	Version: 1.0.0
-]]
-
 --!native
 local Class = require("./Class")
 

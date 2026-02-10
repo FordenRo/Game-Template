@@ -1,10 +1,3 @@
---[[
-	SettingsService
-
-	Written by: FordenRo
-	Version: 0.1.0
-]]
-
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")

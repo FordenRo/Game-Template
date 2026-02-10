@@ -1,10 +1,3 @@
---[[
-	Signal module
-
-	Written by: FordenRo
-	Version: 0.3.0
-]]
-
 -- Preload globals
 local table = table
 local task = task

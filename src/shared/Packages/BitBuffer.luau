@@ -1,10 +1,3 @@
---[[
-	BitBuffer library module
-
-	Written by: FordenRo
-	Version: 1.0.0
-]]
-
 --!native
 local Players = game:GetService("Players")
 

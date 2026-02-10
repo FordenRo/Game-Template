@@ -1,11 +1,3 @@
---[[
-	Trove module
-
-	Written by: FordenRo
-	Dependencies: Signal, TableUtil
-	Version: 1.0.0
-]]
-
 local RunService = game:GetService("RunService")
 
 -- Preloads globals
