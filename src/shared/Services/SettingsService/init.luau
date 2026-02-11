@@ -11,23 +11,23 @@ local SettingsService = {}
 SettingsService.extends = Class
 SettingsService.implements = { Replicated }
 
+local settings: { [Player]: PlayerSettings.PlayerSettings } = {}
+
 export type SettingsService = {
 	--- Settings with default values.
 	DefaultSettings: PlayerSettings.PlayerSettings,
 
-	--- **Client-Only** LocalPlayer's settings.
+	--- **Client-only** LocalPlayer's settings.
 	Settings: PlayerSettings.PlayerSettings,
 
-	--- **Server-Only** Get player's settings.
+	--- **Server-only** Get player's settings.
 	GetPlayerSettings: (
 		self: SettingsService,
 		player: Player
 	) -> PlayerSettings.PlayerSettings,
 } & Class.Class
 
-type Self = {
-	settings: { [Player]: PlayerSettings.PlayerSettings },
-} & Replicated.Replicated & SettingsService
+type Self = Replicated.Replicated & SettingsService
 
 function SettingsService.new(): SettingsService
 	local self: Self = Class(SettingsService)
@@ -35,21 +35,14 @@ function SettingsService.new(): SettingsService
 	self.DefaultSettings = PlayerSettings.new()
 
 	self:CreateRemotes(script)
-	if RunService:IsServer() then
-		initServer(self)
-	else
-		initClient(self)
-	end
+	if RunService:IsClient() then initClient(self) end
 
 	return self
 end
 
-function initServer(self: Self) self.settings = {} end
-
 function initClient(self: Self)
-	self.Settings = PlayerSettings.deserialize(
-		BitBuffer.fromBuffer(self:InvokeServer(Players.LocalPlayer))
-	)
+	self.Settings =
+		PlayerSettings.deserialize(BitBuffer.fromBuffer(self:InvokeServer()))
 
 	self.Settings.Changed:Connect(
 		function(key) self:SendServer(key, self.Settings[key]) end
@@ -62,7 +55,7 @@ function SettingsService.onServerReceived(
 	key: string,
 	value: any
 )
-	self.settings[player]:RawSet(key, value)
+	settings[player]:RawSet(key, value)
 end
 
 function SettingsService.onClientReceived(
@@ -83,7 +76,7 @@ function SettingsService.GetPlayerSettings(self: Self, player: Player)
 		"GetPlayerSettings can only be called on the server."
 	)
 
-	local playerSettings = self.settings[player]
+	local playerSettings = settings[player]
 	if not playerSettings then
 		local datastore = DataStoreService:GetDataStore("Settings")
 		local data = datastore:GetAsync(tostring(player.UserId))
@@ -93,7 +86,7 @@ function SettingsService.GetPlayerSettings(self: Self, player: Player)
 		else
 			playerSettings = PlayerSettings.new()
 		end
-		self.settings[player] = playerSettings
+		settings[player] = playerSettings
 	end
 
 	local changedConn = playerSettings.Changed:Connect(
