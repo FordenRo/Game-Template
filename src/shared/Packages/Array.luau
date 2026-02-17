@@ -14,6 +14,8 @@ export type Array<V> = typeof(setmetatable(
 		IsEmpty: boolean,
 		--- The first item of the array.
 		First: V?,
+		--- The last item of the array.
+		Last: V?,
 
 		--[[
 			Fired immediately after an item of the array changes.
@@ -158,6 +160,8 @@ function Array.isArray(obj: any)
 end
 
 function Array.get.First(self: Self) return self[1] end
+
+function Array.get.Last(self: Self) return self[#self] end
 
 function Array.get.IsEmpty(self: Self) return next(self.__table) == nil end
 
