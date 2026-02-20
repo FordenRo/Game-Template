@@ -118,32 +118,33 @@ local function callInitMethods(self, base: Base)
 	end
 end
 
--- Set meta methods
-local metamethods = {
-	"__index",
-	"__newindex",
-	"__call",
-	"__concat",
-	"__unm",
-	"__add",
-	"__sub",
-	"__mul",
-	"__div",
-	"__idiv",
-	"__mod",
-	"__pow",
-	"__tostring",
-	"__eq",
-	"__lt",
-	"__le",
-	"__len",
-	"__iter",
-}
 local ClassMeta = {}
-for _, v in metamethods do
-	ClassMeta[v] = function(self, ...)
-		local callback = getExtendedValue(self.__base, v)
-		return callback and callback(self, ...)
+do -- Set meta methods
+	local metamethods = {
+		"__index",
+		"__newindex",
+		"__call",
+		"__concat",
+		"__unm",
+		"__add",
+		"__sub",
+		"__mul",
+		"__div",
+		"__idiv",
+		"__mod",
+		"__pow",
+		"__tostring",
+		"__eq",
+		"__lt",
+		"__le",
+		"__len",
+		"__iter",
+	}
+	for _, v in metamethods do
+		ClassMeta[v] = function(self, ...)
+			local callback = getExtendedValue(self.__base, v)
+			return callback and callback(self, ...)
+		end
 	end
 end
 
@@ -208,10 +209,16 @@ function Class.Super(self: Self)
 	}, ClassMeta)
 end
 
-function Class.IsA(self: Self, base: any)
+function Class.IsA(self: Self, base: Base?)
 	if not base then return false end
 
-	return self:TypeOf(base) or self:IsA(base.extends)
+	if self:TypeOf(base) then return true end
+	if self.__base.implements then
+		for _, v in self.__base.implements do
+			self:IsA(v)
+		end
+	end
+	return self:IsA(base.extends)
 end
 
 function Class.TypeOf(self: Self, base: any) return self.__base == base end
@@ -260,9 +267,9 @@ setmetatable(Class, Meta)
 
 return table.freeze(Class) :: setmetatable<
 	{
-		--- Constructs a new component
+		--- Constructs a new class.
 		new: typeof(Class.new),
-		--- Check if an object is a Class
+		--- Check if an object is a Class.
 		isClass: typeof(Class.isClass),
 	},
 	{
