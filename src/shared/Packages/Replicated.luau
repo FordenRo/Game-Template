@@ -41,7 +41,7 @@ export type Replicated = {
 	) & ((self: Replicated, scope: string) -> ()),
 }
 
-type Self = {
+type Self = setmetatable<{
 	RE: RemoteEvent,
 	URE: UnreliableRemoteEvent,
 	RF: RemoteFunction,
@@ -51,7 +51,7 @@ type Self = {
 
 	onServerReceived: ((self: Self, player: Player, ...any) -> ())?,
 	onClientReceived: ((self: Self, ...any) -> ())?,
-} & Replicated
+}, { __index: Replicated }>
 
 function Replicated.onExtended(self: Self)
 	error("Replicated can only be implemented.")

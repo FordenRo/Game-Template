@@ -13,21 +13,24 @@ SettingsService.implements = { Replicated }
 
 local settings: { [Player]: PlayerSettings.PlayerSettings } = {}
 
-export type SettingsService = {
-	--- Settings with default values.
-	DefaultSettings: PlayerSettings.PlayerSettings,
+export type SettingsService = setmetatable<
+	{
+		--- Settings with default values.
+		DefaultSettings: PlayerSettings.PlayerSettings,
 
-	--- **Client-only** LocalPlayer's settings.
-	Settings: PlayerSettings.PlayerSettings,
+		--- **Client-only** LocalPlayer's settings.
+		Settings: PlayerSettings.PlayerSettings,
 
-	--- **Server-only** Get player's settings.
-	GetPlayerSettings: (
-		self: SettingsService,
-		player: Player
-	) -> PlayerSettings.PlayerSettings,
-} & Class.Class
+		--- **Server-only** Get player's settings.
+		GetPlayerSettings: (
+			self: SettingsService,
+			player: Player
+		) -> PlayerSettings.PlayerSettings,
+	},
+	{ __index: Class.Class }
+>
 
-type Self = Replicated.Replicated & SettingsService
+type Self = setmetatable<Replicated.Replicated, { __index: SettingsService }>
 
 function SettingsService.new(): SettingsService
 	local self: Self = Class(SettingsService)

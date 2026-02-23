@@ -21,11 +21,11 @@ export type Connection = {
 	Connected: boolean,
 }
 
-type ConnectionSelf = {
+type ConnectionSelf = setmetatable<{
 	signal: Self,
 	next: ConnectionSelf,
 	callback: (...any) -> (),
-} & Connection
+}, { __index: Connection }>
 
 function Connection.new(signal, callback: (...any) -> ()): Connection
 	local self: ConnectionSelf = setmetatable({}, Connection)
@@ -142,11 +142,11 @@ export type Signal<T...> = {
 	Wait: (self: Signal<T...>) -> T...,
 }
 
-type Self = {
+type Self = setmetatable<{
 	handlerListHead: ConnectionSelf?,
 	proxyHandler: RBXScriptConnection?,
 	yieldedThreads: { thread },
-} & Signal<...any>
+}, { __index: Signal<...any> }>
 
 function Signal.new<T...>(): Signal<T...>
 	local self: Self = setmetatable({}, Signal)

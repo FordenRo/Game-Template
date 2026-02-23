@@ -163,7 +163,10 @@ export type Trove = {
 	Destroy: (self: Trove) -> (),
 }
 
-type Self = { objects: { [any]: (any) -> () } } & Trove
+type Self = setmetatable<
+	{ objects: { [any]: (any) -> () } },
+	{ __index: Trove }
+>
 
 --[[
 	A Trove is helpful for tracking any sort of object during

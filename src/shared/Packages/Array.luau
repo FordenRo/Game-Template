@@ -125,9 +125,9 @@ export type Array<V> = typeof(setmetatable(
 	}
 ))
 
-type Self = {
+type Self = setmetatable<{
 	__table: { any },
-} & Array<any>
+}, { __index: Array<any> }>
 
 function Meta.__call<V>(_, ...: V): Array<V> return Array.fromTable({ ... }) end
 

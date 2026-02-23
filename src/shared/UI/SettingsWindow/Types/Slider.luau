@@ -7,9 +7,9 @@ local Trove = require("../../../Packages/Trove")
 local Slider = { set = {} }
 Slider.extends = Component
 
-export type Slider = {
+export type Slider = setmetatable<{
 	Value: number,
-} & Component.Component<{
+}, { __index: Component.Component<{
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
@@ -24,14 +24,14 @@ export type Slider = {
 		Reset: ImageButton,
 		Value: TextBox,
 	} & Frame,
-} & Frame>
+} & Frame> }>
 
-type Self = {
+type Self = setmetatable<{
 	config: SettingTypes.Slider,
 	drag: UIDragDetector,
 	reset: ImageButton,
 	box: TextBox,
-} & Slider
+}, { __index: Slider }>
 
 local function toNormal(self: Self, x: number)
 	return x * self.config.Max + self.config.Min

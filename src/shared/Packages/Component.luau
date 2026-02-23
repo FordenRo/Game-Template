@@ -7,9 +7,9 @@ local components = {}
 local Component = {}
 Component.extends = Class
 
-export type Component<Instance> = {
+export type Component<Instance> = setmetatable<{
 	Instance: Instance,
-} & Class.Class
+}, { __index: Class.Class }>
 
 type Self = Component<Instance>
 
@@ -18,7 +18,10 @@ function Meta.__call<Instance, B, S>(
 	instance: Instance,
 	base: B,
 	source: S?
-): Component<Instance> & B & S
+): setmetatable<
+	S,
+	{ __index: setmetatable<B, { __index: Component<Instance> }> }
+>
 	assert(
 		components[instance] == nil,
 		`{instance.Name} already has a Component`
@@ -39,7 +42,10 @@ end
 function Component.new<Instance, S>(
 	instance: Instance,
 	source: S?
-): Component<Instance> & S
+): setmetatable<
+	S,
+	{ __index: Component<Instance> }
+>
 	return Component(instance, { extends = Component }, source)
 end
 

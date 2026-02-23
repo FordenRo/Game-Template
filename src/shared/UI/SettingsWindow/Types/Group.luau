@@ -8,9 +8,9 @@ local Trove = require("../../../Packages/Trove")
 local Group = { change = {} }
 Group.extends = Component
 
-export type Group = {
+export type Group = setmetatable<{
 	Expanded: boolean,
-} & Component.Component<{
+}, { __index: Component.Component<{
 	UIPadding: UIPadding,
 	UIStroke: UIStroke,
 	Content: { UIListLayout: UIListLayout } & Frame,
@@ -21,12 +21,12 @@ export type Group = {
 		} & Frame,
 		Arrow: ImageLabel,
 	} & ImageButton,
-} & ImageButton>
+} & ImageButton> }>
 
-type Self = {
+type Self = setmetatable<{
 	size: number,
 	trove: Trove.Trove,
-} & Group
+}, { __index: Group }>
 
 local function initChild(self: Self, child: Instance)
 	if not child:IsA("GuiObject") then return end

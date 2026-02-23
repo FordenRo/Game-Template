@@ -41,15 +41,16 @@ export type Dictionary<V> = typeof(setmetatable(
 		DeepClone: <Dictionary>(self: Dictionary) -> Dictionary,
 	},
 	{} :: {
+		__index: (self: Dictionary<V>, key: string) -> V,
 		__len: (self: Dictionary<V>) -> number,
 		__concat: typeof(Dictionary.__concat),
 		__iter: (self: Dictionary<V>) -> () -> (string, V),
 	}
 ))
 
-type Self = {
+type Self = setmetatable<{
 	__table: { [string]: any },
-} & Dictionary<any>
+}, { __index: Dictionary<any> }>
 
 function Meta.__call<V>(_, t: { [string]: V }): Dictionary<V>
 	local self = setmetatable({

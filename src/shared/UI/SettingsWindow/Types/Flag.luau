@@ -8,15 +8,15 @@ local Trove = require("../../../Packages/Trove")
 local Flag = { change = {} }
 Flag.extends = Component
 
-export type Flag = {
+export type Flag = setmetatable<{
 	Value: boolean,
-} & Component.Component<{
+}, { __index: Component.Component<{
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
 	} & Frame,
 	CheckBox: { Check: ImageLabel } & ImageButton,
-} & Frame>
+} & Frame> }>
 
 type Self = Flag
 
