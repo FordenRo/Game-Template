@@ -10,8 +10,8 @@ local math = math
 local BitPacket = {}
 BitPacket.extends = Class
 
-export type BitPacket<V> = setmetatable<
-	{
+export type BitPacket<V> = typeof(setmetatable(
+	{} :: {
 		--- Writes the value to provided BitBuffer.
 		Write: (self: BitPacket<V>, bb: BitBuffer.BitBuffer, value: V) -> (),
 		--- Reads the value from provided BitBuffer.
@@ -22,8 +22,8 @@ export type BitPacket<V> = setmetatable<
 		--- Reads the value from provided BitBuffer.
 		Deserialize: (self: BitPacket<V>, bb: BitBuffer.BitBuffer) -> V,
 	},
-	{ __index: Class.Class }
->
+	{} :: { __index: Class.Class }
+))
 
 type Deserializable<T> = {
 	deserialize: (bb: BitBuffer.BitBuffer) -> T,

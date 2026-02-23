@@ -132,7 +132,7 @@ type Self = setmetatable<{
 function Meta.__call<V>(_, ...: V): Array<V> return Array.fromTable({ ... }) end
 
 function Array.fromTable<V>(t: { V }): Array<V>
-	local self = setmetatable({
+	local self: Self = setmetatable({
 		__table = t,
 		ItemChanged = Signal.new(),
 		ItemAdded = Signal.new(),
