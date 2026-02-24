@@ -70,6 +70,8 @@ type Base = {
 	change: { [string]: (self: Base) -> () }?,
 }
 
+--#region Utils
+
 local function getExtendedGetter(base: Base, k: string)
 	if base.get and base.get[k] then return base.get[k] end
 	return base.extends and getExtendedGetter(base.extends, k)
@@ -117,6 +119,8 @@ local function callInitMethods(self: Self, base: Base)
 		end
 	end
 end
+
+--#endregion
 
 local ClassMeta = {}
 do -- Set meta methods
@@ -230,7 +234,7 @@ end
 
 function Class.TypeOf(self: Self, base: any) return self.__base == base end
 
---- Metamethods ---
+--#region Metamethods
 
 function Class.__index(self: Self, k: string)
 	local base = self.__base
@@ -269,6 +273,8 @@ function Class.__tostring(self: Self)
 	end
 	return `Class({str})`
 end
+
+--#endregion
 
 setmetatable(Class, Meta)
 

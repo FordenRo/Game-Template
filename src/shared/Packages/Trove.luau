@@ -4,6 +4,8 @@ local RunService = game:GetService("RunService")
 local task = task
 local table = table
 
+--#region Types
+
 --- Represents all trackable objects by Trove.
 type Trackable =
 	Instance
@@ -167,6 +169,8 @@ type Self = setmetatable<
 	{ objects: { [any]: (any) -> () } },
 	{ __index: Trove }
 >
+
+--#endregion
 
 --[[
 	A Trove is helpful for tracking any sort of object during

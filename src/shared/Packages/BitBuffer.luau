@@ -9,13 +9,12 @@ local buffer = buffer
 local bit32 = bit32
 local string = string
 
-local HEX = "0123456789ABCDEF"
-
 local BitBuffer = { change = {} }
 BitBuffer.extends = Class
 
+--#region Symbols sheets
 BitBuffer.Sym = {}
-BitBuffer.Sym.HEX = HEX
+BitBuffer.Sym.HEX = "0123456789ABCDEF"
 BitBuffer.Sym.UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 BitBuffer.Sym.LOWER = "abcdefghijklmnopqrstuvwxyz"
 BitBuffer.Sym.ALPHA = BitBuffer.Sym.UPPER .. BitBuffer.Sym.LOWER
@@ -28,6 +27,7 @@ BitBuffer.Sym.SPACE = BitBuffer.Sym.BLANK .. "\v\r\n\f"
 BitBuffer.Sym.PRINT = BitBuffer.Sym.ALNUM
 	.. BitBuffer.Sym.PUNCT
 	.. BitBuffer.Sym.SPACE
+--#endregion
 
 export type BitBuffer = setmetatable<
 	{
@@ -59,16 +59,16 @@ export type BitBuffer = setmetatable<
 		ReadStringRaw: (self: BitBuffer, length: number) -> string,
 
 		--[[
-		Writes a string with maximum length of 2 ^ `bitCount`.
+			Writes a string with maximum length of 2 ^ `bitCount`.
 
-		To read it, you must use `BitBuffer:ReadString()`.
-	]]
+			To read it, you must use `BitBuffer:ReadString()`.
+		]]
 		WriteString: (self: BitBuffer, value: string, bitCount: number?) -> (),
 		--[[
-		Reads a string with maximum length of 2 ^ `bitCount`.
+			Reads a string with maximum length of 2 ^ `bitCount`.
 
-		String must be written with `BitBuffer:WriteString()`.
-	]]
+			String must be written with `BitBuffer:WriteString()`.
+		]]
 		ReadString: (self: BitBuffer, bitCount: number?) -> string,
 
 		--- Writes a string with custom `symbols` sheet.
@@ -85,11 +85,11 @@ export type BitBuffer = setmetatable<
 		) -> string,
 
 		--[[
-		Writes a string with custom `symbols` sheet
-		with maximum length of 2 ^ `bitCount`.
+			Writes a string with custom `symbols` sheet
+			with maximum length of 2 ^ `bitCount`.
 
-		To read it, you must use `BitBuffer:ReadSymString()`.
-	]]
+			To read it, you must use `BitBuffer:ReadSymString()`.
+		]]
 		WriteSymString: (
 			self: BitBuffer,
 			value: string,
@@ -97,11 +97,11 @@ export type BitBuffer = setmetatable<
 			bitCount: number?
 		) -> (),
 		--[[
-		Reads a string with custom `symbols` sheet
-		with maximum length of 2 ^ `bitCount`.
+			Reads a string with custom `symbols` sheet
+			with maximum length of 2 ^ `bitCount`.
 
-		String must be written with `BitBuffer:WriteSymString()`.
-	]]
+			String must be written with `BitBuffer:WriteSymString()`.
+		]]
 		ReadSymString: (
 			self: BitBuffer,
 			symbols: string,
@@ -134,74 +134,75 @@ export type BitBuffer = setmetatable<
 		ReadBufferRaw: (self: BitBuffer, bitCount: number) -> buffer,
 
 		--[[
-		Writes a buffer with maximum size of 2 ^ `bitCount` bytes.
+			Writes a buffer with maximum size of 2 ^ `bitCount` bytes.
 
-		To read it, you must use `BitBuffer:ReadBuffer()`.
-	]]
+			To read it, you must use `BitBuffer:ReadBuffer()`.
+		]]
 		WriteBuffer: (self: BitBuffer, value: buffer, bitCount: number?) -> (),
 		--[[
-		Reads a buffer with maximum size of 2 ^ `bitCount` bytes.
+			Reads a buffer with maximum size of 2 ^ `bitCount` bytes.
 
-		Buffer must be written with `BitBuffer:WriteBuffer()`.
-	]]
+			Buffer must be written with `BitBuffer:WriteBuffer()`.
+		]]
 		ReadBuffer: (self: BitBuffer, bitCount: number?) -> buffer,
 
 		--[[
-		Writes a BitBuffer without writing the size of it.
-		Basically just merges provided BitBuffer.
-	]]
+			Writes a BitBuffer without writing the size of it.
+			Basically just merges provided BitBuffer.
+		]]
 		WriteBitBufferRaw: (self: BitBuffer, value: BitBuffer) -> (),
 		--[[
-		Reads a BitBuffer from `bitCount` bits.
+			Reads a BitBuffer from `bitCount` bits.
 
-		You cannot read a BitBuffer written with `BitBuffer:WriteBitBuffer()`.
-	]]
+			You cannot read a BitBuffer written with `BitBuffer:WriteBitBuffer()`.
+		]]
 		ReadBitBufferRaw: (self: BitBuffer, bitCount: number) -> BitBuffer,
 
 		--[[
-		Writes a BitBuffer with maximum size of 2 ^ `bitCount`.
+			Writes a BitBuffer with maximum size of 2 ^ `bitCount`.
 
-		To read it, you must use `BitBuffer:ReadBitBuffer()`.
-	]]
+			To read it, you must use `BitBuffer:ReadBitBuffer()`.
+		]]
 		WriteBitBuffer: (
 			self: BitBuffer,
 			value: BitBuffer,
 			bitCount: number?
 		) -> (),
 		--[[
-		Reads a BitBuffer with maximum size of 2 ^ `bitCount`.
+			Reads a BitBuffer with maximum size of 2 ^ `bitCount`.
 
-		BitBuffer must be written with `BitBuffer:WriteBitBuffer()`.
-	]]
+			BitBuffer must be written with `BitBuffer:WriteBitBuffer()`.
+		]]
 		ReadBitBuffer: (self: BitBuffer, bitCount: number?) -> BitBuffer,
 
 		--- Shrinks the internal buffer to the real size.
 		Shrink: (self: BitBuffer) -> (),
 
 		--[[
-		Returns the buffer. Additionally writes 3 bits in the start
-		to describe the bits offset of the size.
+			Returns the buffer. Additionally writes 3 bits in the start
+			to describe the bits offset of the size.
 
-		To convert it back, you must use `BitBuffer.fromBuffer()`.
-	]]
-		---
+			To convert it back, you must use `BitBuffer.fromBuffer()`.
+		]]
 		toBuffer: (self: BitBuffer) -> buffer,
 		--[[
-		Returns hex string without size offset.
-	]]
+			Returns hex string without size offset.
+		]]
 		toRawHex: (self: BitBuffer) -> string,
 		--[[
-		Returns hex string with size offset in the first char
-		to describe the bits offset of the size.
+			Returns hex string with size offset in the first char
+			to describe the bits offset of the size.
 
-		To convert it back, you must use `BitBuffer.fromHex()`.
-	]]
+			To convert it back, you must use `BitBuffer.fromHex()`.
+		]]
 		toHex: (self: BitBuffer) -> string,
 	},
 	{ __index: Class.Class }
 >
 
 type Self = BitBuffer
+
+--#region Constructor methods
 
 function BitBuffer.new(byteCount: number?): BitBuffer
 	local self: Self = Class(BitBuffer)
@@ -211,15 +212,6 @@ function BitBuffer.new(byteCount: number?): BitBuffer
 	self.Size = 0
 
 	return self
-end
-
-function BitBuffer.change.Size(self: Self)
-	local sizeB = math.ceil(self.Size / 8)
-	if buffer.len(self.RawBuffer) >= sizeB then return end
-
-	local oldB = self.RawBuffer
-	self.RawBuffer = buffer.create(sizeB)
-	buffer.copy(self.RawBuffer, 0, oldB, 0)
 end
 
 function BitBuffer.fromRawBuffer(b: buffer): BitBuffer
@@ -254,8 +246,9 @@ end
 function BitBuffer.fromRawHex(s: string): BitBuffer
 	local self: Self = BitBuffer.new(math.ceil(#s / 2))
 
+	local charset = BitBuffer.Sym.HEX
 	for i = 1, #s do
-		self:WriteUint(HEX:find(s:sub(i, i)), 4)
+		self:WriteUint(charset:find(s:sub(i, i) - 1), 4)
 	end
 
 	self.Cursor = 0
@@ -263,21 +256,35 @@ function BitBuffer.fromRawHex(s: string): BitBuffer
 end
 
 function BitBuffer.fromHex(s: string): BitBuffer
-	local tail = HEX:find(s:sub(1, 1)) :: number - 1
-
 	local self: Self = BitBuffer.new(math.ceil((#s - 1) / 2))
 
+	local charset = BitBuffer.Sym.HEX
+	local tail = charset:find(s:sub(1, 1)) :: number - 1
+
 	for i = 2, #s - (tail > 0 and 1 or 0) do
-		self:WriteUint((HEX:find(s:sub(i, i)) - 1), 4)
+		self:WriteUint((charset:find(s:sub(i, i)) - 1), 4)
 	end
 	if tail > 0 then
 		local u = #s
-		self:WriteUint(HEX:find(s:sub(u, u)) - 1, tail)
+		self:WriteUint(charset:find(s:sub(u, u)) - 1, tail)
 	end
 
 	self.Cursor = 0
 	return self
 end
+
+--#endregion
+
+function BitBuffer.change.Size(self: Self)
+	local sizeB = math.ceil(self.Size / 8)
+	if buffer.len(self.RawBuffer) >= sizeB then return end
+
+	local oldB = self.RawBuffer
+	self.RawBuffer = buffer.create(sizeB)
+	buffer.copy(self.RawBuffer, 0, oldB, 0)
+end
+
+--#region Methods
 
 function BitBuffer.WriteUint(self: Self, value: number, bitCount: number?)
 	bitCount = bitCount or 8
@@ -524,15 +531,16 @@ function BitBuffer.toRawHex(self: Self)
 	local lastCursor = self.Cursor
 	self.Cursor = 0
 
+	local charset = BitBuffer.Sym.HEX
 	local s = ""
 	for i = 1, math.floor(self.Size / 4) do
 		local u = self:ReadUint(4) + 1
-		s ..= HEX:sub(u, u)
+		s ..= charset:sub(u, u)
 	end
 	local tail = self.Size % 4
 	if tail > 0 then
 		local u = self:ReadUint(tail) + 1
-		s ..= HEX:sub(u, u)
+		s ..= charset:sub(u, u)
 	end
 
 	self.Cursor = lastCursor
@@ -541,8 +549,10 @@ end
 
 function BitBuffer.toHex(self: Self)
 	local u = self.Size % 4 + 1
-	return HEX:sub(u, u) .. self:toRawHex()
+	return BitBuffer.Sym.HEX:sub(u, u) .. self:toRawHex()
 end
+
+--#endregion
 
 return table.freeze(BitBuffer) :: {
 	--- Creates a clean BitBuffer with internal buffer size of `bytesCount` bytes.
@@ -575,7 +585,7 @@ return table.freeze(BitBuffer) :: {
 	--[[
 		Creates BitBuffer from hex string.
 
-		The buffer must be got with `BitBuffer:toHex()`.
+		The string must be got with `BitBuffer:toHex()`.
 	]]
 	fromHex: typeof(BitBuffer.fromHex),
 

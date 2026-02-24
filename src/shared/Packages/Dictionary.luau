@@ -74,6 +74,8 @@ function Dictionary.isDictionary(obj: any): boolean
 	return typeof(obj) == "table" and getmetatable(obj) == Dictionary
 end
 
+--#region Getters
+
 function Dictionary.get.Keys(self: Self)
 	local t = {}
 	for k, _ in self do
@@ -91,6 +93,10 @@ function Dictionary.get.Values(self: Self)
 end
 
 function Dictionary.get.IsEmpty(self: Self) return next(self.__table) == nil end
+
+--#endregion
+
+--#region Methods
 
 function Dictionary.Merge(self: Self, value: any)
 	for k, v in value do
@@ -148,7 +154,9 @@ end
 
 function Dictionary.asTable(self: Self) return self.__table end
 
---- Metamethods ---
+--#endregion
+
+--#region Metamethods
 
 function Dictionary.__index(self: Self, k)
 	return Dictionary[k]
@@ -189,6 +197,8 @@ function Dictionary.__tostring(self: Self)
 	end
 	return `Dictionary({str})`
 end
+
+--#endregion
 
 setmetatable(Dictionary, Meta)
 

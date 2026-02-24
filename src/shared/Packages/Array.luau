@@ -29,7 +29,6 @@ export type Array<V> = typeof(setmetatable(
 			```
 		]]
 		ItemChanged: Signal.Signal<number, V, V>,
-
 		--[[
 			Fired immediately after an item is added to the array.
 
@@ -42,7 +41,6 @@ export type Array<V> = typeof(setmetatable(
 			```
 		]]
 		ItemAdded: Signal.Signal<number, V>,
-
 		--[[
 			Fired immediately after an item is removed from the array.
 
@@ -58,61 +56,46 @@ export type Array<V> = typeof(setmetatable(
 
 		--- Returns array content as a table.
 		asTable: (self: Array<V>) -> { V },
-
 		--[[
 			Adds a `value` to the array at the given index or at the end.
 
 			This will fire `ItemAdded` signal.
 		]]
 		Add: (self: Array<V>, value: V, index: number?) -> (),
-
 		--- Adds all values to the array.
 		AddAll: (self: Array<V>, ...V) -> (),
-
 		--- Adds given table or array to the array.
 		Merge: (self: Array<V>, { V } | Array<V>) -> (),
-
 		--[[
 			Removes an item at the index from the array and returns it.
 
 			This will fire `ItemRemoved` signal.
 		]]
 		RemoveAt: (self: Array<V>, index: number) -> V,
-
 		--[[
 			Removes the `value` from the array and returns index of it.
 
 			This will fire `ItemRemoved` signal.
 		]]
 		Remove: (self: Array<V>, value: V) -> number?,
-
 		--- Returns an index of the given `value`.
 		IndexOf: (self: Array<V>, value: V) -> number?,
-
 		--- Checks if a value contains in the array.
 		Contains: (self: Array<V>, value: V) -> boolean,
-
 		--- Returns mapped array using the `f` function.
 		Mapped: typeof(Array.Mapped),
-
 		--- Returns filtered array using the `f` function.
 		Filtered: (self: Array<V>, f: (V) -> boolean) -> Array<V>,
-
 		--- Returns reversed array.
 		Reversed: (self: Array<V>) -> Array<V>,
-
 		--- Return sorted array using the `f` function.
 		Sorted: (self: Array<V>, f: (V, V) -> boolean) -> Array<V>,
-
 		--- Returns randomized array.
 		Randomized: (self: Array<V>, seed: number?) -> Array<V>,
-
 		--- Returns an array containing only unique items.
 		Unified: (self: Array<V>) -> Array<V>,
-
-		--- Returns a copy of the array.
+		--- Returns a shallow copy of the array.
 		Clone: <Array>(self: Array) -> Array,
-
 		--- Returns a deep copy of the array.
 		DeepClone: <Array>(self: Array) -> Array,
 	} & { V },
@@ -128,6 +111,8 @@ export type Array<V> = typeof(setmetatable(
 type Self = setmetatable<{
 	__table: { any },
 }, { __index: Array<any> }>
+
+--#region Constructor methods
 
 function Meta.__call<V>(_, ...: V): Array<V> return Array.fromTable({ ... }) end
 
@@ -159,11 +144,19 @@ function Array.isArray(obj: any)
 	return typeof(obj) == "table" and getmetatable(obj) == Array
 end
 
+--#endregion
+
+--#region Getters
+
 function Array.get.First(self: Self) return self[1] end
 
 function Array.get.Last(self: Self) return self[#self] end
 
 function Array.get.IsEmpty(self: Self) return next(self.__table) == nil end
+
+--#endregion
+
+--#region Methods
 
 function Array.Add(self: Self, value: any, index: number?)
 	if index then
@@ -269,7 +262,9 @@ end
 
 function Array.asTable(self: Self) return self.__table end
 
---- Metamethods ---
+--#endregion
+
+--#region Metamethods
 
 function Array.__index(self: Self, k: number | string)
 	if typeof(k) == "string" then return Array[k] or Array.get[k](self) end
@@ -315,6 +310,8 @@ end
 function Array.__tostring(self: Self)
 	return `Array({table.concat(self.__table, ", ")})`
 end
+
+--#endregion
 
 setmetatable(Array, Meta)
 

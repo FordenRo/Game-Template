@@ -3,6 +3,8 @@ local table = table
 local task = task
 local coroutine = coroutine
 
+--#region Connection class
+
 local Connection = {}
 Connection.__index = Connection
 
@@ -55,6 +57,8 @@ function Connection.Disconnect(self: ConnectionSelf)
 		if prev then prev.next = self.next end
 	end
 end
+
+--#endregion
 
 local Signal = {}
 Signal.__index = Signal
