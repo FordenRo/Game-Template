@@ -27,6 +27,10 @@ BitBuffer.Sym.SPACE = BitBuffer.Sym.BLANK .. "\v\r\n\f"
 BitBuffer.Sym.PRINT = BitBuffer.Sym.ALNUM
 	.. BitBuffer.Sym.PUNCT
 	.. BitBuffer.Sym.SPACE
+BitBuffer.Sym.Base64 = BitBuffer.Sym.UPPER
+	.. BitBuffer.Sym.LOWER
+	.. BitBuffer.Sym.DIGIT
+	.. "+/"
 --#endregion
 
 export type BitBuffer = setmetatable<
@@ -196,6 +200,15 @@ export type BitBuffer = setmetatable<
 			To convert it back, you must use `BitBuffer.fromHex()`.
 		]]
 		toHex: (self: BitBuffer) -> string,
+		--- Returns Base64 (RPC 4648) string without size offset.
+		toRawBase64: (self: BitBuffer) -> string,
+		--[[
+			Returns Base64 (RPC 4648) string with size offset in the first char
+			to describe the bits offset of the size.
+
+			To convert it back, you must use `BitBuffer.fromBase64()`.
+		]]
+		toBase64: (self: BitBuffer) -> string,
 	},
 	{ __index: Class.Class }
 >
@@ -270,6 +283,35 @@ function BitBuffer.fromHex(s: string): BitBuffer
 	end
 
 	self.Cursor = 0
+	return self
+end
+
+function BitBuffer.fromRawBase64(s: string): BitBuffer
+	local self: Self = BitBuffer.new(math.ceil(#s * 8 / 6))
+
+	local charset = BitBuffer.Sym.Base64
+	for i = 1, #s do
+		self:WriteUint(charset:find(s:sub(i, i) - 1), 6)
+	end
+
+	self.Cursor = 0
+	return self
+end
+
+function BitBuffer.fromBase64(s: string): BitBuffer
+	local self: Self = BitBuffer.new(math.ceil((#s - 1) * 8 / 6))
+
+	local charset = BitBuffer.Sym.Base64
+	local tail = charset:find(s:sub(1, 1)) :: number - 1
+
+	for i = 2, #s - (tail > 0 and 1 or 0) do
+		self:WriteUint((charset:find(s:sub(i, i)) - 1), 6)
+	end
+	if tail > 0 then
+		local u = #s
+		self:WriteUint(charset:find(s:sub(u, u)) - 1, tail)
+	end
+
 	return self
 end
 
@@ -552,6 +594,31 @@ function BitBuffer.toHex(self: Self)
 	return BitBuffer.Sym.HEX:sub(u, u) .. self:toRawHex()
 end
 
+function BitBuffer.toRawBase64(self: Self)
+	local lastCursor = self.Cursor
+	self.Cursor = 0
+
+	local charset = BitBuffer.Sym.Base64
+	local s = ""
+	for i = 1, math.floor(self.Size / 6) do
+		local u = self:ReadUint(6) + 1
+		s ..= charset:sub(u, u)
+	end
+	local tail = self.Size % 6
+	if tail > 0 then
+		local u = self:ReadUint(tail) + 1
+		s ..= charset:sub(u, u)
+	end
+
+	self.Cursor = lastCursor
+	return s
+end
+
+function BitBuffer.toBase64(self: Self)
+	local u = self.Size % 6 + 1
+	return BitBuffer.Sym.Base64:sub(u, u) .. self:toRawBase64()
+end
+
 --#endregion
 
 return table.freeze(BitBuffer) :: {
@@ -588,6 +655,20 @@ return table.freeze(BitBuffer) :: {
 		The string must be got with `BitBuffer:toHex()`.
 	]]
 	fromHex: typeof(BitBuffer.fromHex),
+
+	--[[
+		Creates BitBuffer from Base64 (RPC 4648) string without size offset.
+
+		Not recommended, because this will provide non-real size of the buffer.
+	]]
+	fromRawBase64: typeof(BitBuffer.fromRawBase64),
+
+	--[[
+		Creates BitBuffer from Base64 (RPC 4648) string.
+
+		The string must be got with `BitBuffer:toBase64()`.
+	]]
+	fromBase64: typeof(BitBuffer.fromBase64),
 
 	--- Symbol sheets to use in `BitBuffer:WriteSymString()`.
 	Sym: typeof(BitBuffer.Sym),
