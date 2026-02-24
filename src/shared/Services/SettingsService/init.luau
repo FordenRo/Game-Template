@@ -45,7 +45,7 @@ end
 
 function initClient(self: Self)
 	self.Settings =
-		PlayerSettings.deserialize(BitBuffer.fromBuffer(self:InvokeServer()))
+		PlayerSettings.deserialize(BitBuffer.fromBase64(self:InvokeServer()))
 
 	self.Settings.Changed:Connect(
 		function(key) self:SendServer(key, self.Settings[key]) end
@@ -70,7 +70,7 @@ function SettingsService.onClientReceived(
 end
 
 function SettingsService.onServerInvoked(self: Self, player: Player)
-	return self:GetPlayerSettings(player):Serialize():toBuffer()
+	return self:GetPlayerSettings(player):Serialize():toBase64()
 end
 
 function SettingsService.GetPlayerSettings(self: Self, player: Player)
@@ -85,7 +85,7 @@ function SettingsService.GetPlayerSettings(self: Self, player: Player)
 		local data = datastore:GetAsync(tostring(player.UserId))
 		if data then
 			playerSettings =
-				PlayerSettings.deserialize(BitBuffer.fromBuffer(data))
+				PlayerSettings.deserialize(BitBuffer.fromBase64(data))
 		else
 			playerSettings = PlayerSettings.new()
 		end
@@ -104,7 +104,7 @@ function SettingsService.GetPlayerSettings(self: Self, player: Player)
 		if playerSettings:asTable() ~= self.DefaultSettings:asTable() then
 			datastore:SetAsync(
 				tostring(player.UserId),
-				playerSettings:Serialize():toBuffer()
+				playerSettings:Serialize():toBase64()
 			)
 		else
 			datastore:RemoveAsync(tostring(player.UserId))
