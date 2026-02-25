@@ -1,0 +1,59 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Binding = require("@self/Binding")
+local Component = require("../../../Packages/Component")
+local InputTypes = require("../../../Services/InputService/InputTypes")
+local Trove = require("../../../Packages/Trove")
+
+local ActionBinding = { change = {} }
+ActionBinding.extends = Component
+
+export type ActionBinding = setmetatable<{
+	InputAction: InputAction,
+	Config: InputTypes.BaseAction,
+	Bindings: { Binding.Binding },
+}, { __index: Component.Component<{
+	Content: {
+		Title: TextLabel,
+		Description: TextLabel,
+	} & Frame,
+	Control: {
+		Reset: ImageButton,
+		Add: TextButton,
+	} & Frame,
+} & Frame> }>
+
+type Self = ActionBinding
+
+function ActionBinding.new(
+	inputAction: InputAction,
+	config: InputTypes.BaseAction
+): ActionBinding
+	local self: Self = Component(
+		ReplicatedStorage.UI.Settings.Types.ActionBinding:Clone(),
+		ActionBinding
+	)
+
+	self.Config = config
+	self.InputAction = inputAction
+
+	self.Instance.Content.Title.Text = config.Title
+	self.Instance.Content.Description.Text = config.Description
+	self.Instance.Content.Description.Visible = config.Description ~= ""
+	self.Instance.LayoutOrder = config.Index
+
+	local trove = Trove.new()
+	trove:AddAll(
+		self.Instance.Control.Reset.Activated:Connect(function() end),
+		self.Instance.Control.Add.Activated:Connect(function() end)
+	)
+
+	trove:AttachToInstance(self.Instance)
+	return self
+end
+
+-- function ActionBinding.AddBinding(self: Self) end
+
+return table.freeze(ActionBinding) :: {
+	new: typeof(ActionBinding.new),
+}
