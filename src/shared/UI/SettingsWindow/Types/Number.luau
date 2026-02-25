@@ -7,9 +7,9 @@ local Trove = require("../../../Packages/Trove")
 local Number = { set = {} }
 Number.extends = Component
 
-export type Number = setmetatable<{
+export type Number = {
 	Value: number,
-}, { __index: Component.Component<{
+} & Component.Component<{
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
@@ -18,13 +18,13 @@ export type Number = setmetatable<{
 		Reset: ImageButton,
 		Value: TextBox,
 	} & Frame,
-} & Frame> }>
+} & Frame>
 
-type Self = setmetatable<{
+type Self = {
 	config: SettingTypes.Slider,
 	reset: ImageButton,
 	box: TextBox,
-}, { __index: Number }>
+} & Number
 
 local function setBoxValue(self: Self, x: number)
 	local l = self.config.Step >= 1 and 0 or self.config.Step >= 0.1 and 1 or 2

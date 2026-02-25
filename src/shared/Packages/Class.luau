@@ -54,11 +54,11 @@ export type Class = {
 	Clone: <Class>(self: Class) -> Class,
 }
 
-type Self = setmetatable<{
+type Self = {
 	__propChangedSignals: { [string]: Signal.Signal<> },
 	__table: {},
 	__base: Base,
-}, { __index: Class }>
+} & Class
 
 type Base = {
 	extends: Base?,
@@ -96,7 +96,7 @@ local function getExtendedSetter(base: Base, k: string)
 	return base.extends and getExtendedSetter(base.extends, k)
 end
 
-local function callChangeds(self: Self, base: Base, k: string)
+local function callChangeds(self, base: Base, k: string)
 	if base.change and base.change[k] then base.change[k](self) end
 	if base.extends then callChangeds(self, base.extends, k) end
 	if base.implements then
@@ -106,7 +106,7 @@ local function callChangeds(self: Self, base: Base, k: string)
 	end
 end
 
-local function callInitMethods(self: Self, base: Base)
+local function callInitMethods(self, base: Base)
 	local ext = base.extends
 	if ext then
 		if ext.onExtended then ext.onExtended(self) end
@@ -152,14 +152,7 @@ do -- Set meta methods
 	end
 end
 
-function Meta.__call<B, S>(
-	_,
-	base: B,
-	source: S?
-): setmetatable<
-	S,
-	{ __index: setmetatable<B, { __index: Class }> }
->
+function Meta.__call<B, S>(_, base: B, source: S?): S & B & Class
 	local t = source and source.__table or source or {}
 
 	local self: Self = setmetatable({
@@ -173,7 +166,7 @@ function Meta.__call<B, S>(
 	return self
 end
 
-function Class.new<S>(source: S?): setmetatable<S, { __index: Class }>
+function Class.new<S>(source: S?): S & Class
 	return Class({ extends = Class }, source)
 end
 

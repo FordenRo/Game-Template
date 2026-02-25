@@ -108,9 +108,9 @@ export type Array<V> = typeof(setmetatable(
 	}
 ))
 
-type Self = setmetatable<{
+type Self = {
 	__table: { any },
-}, { __index: Array<any> }>
+} & Array<any>
 
 --#region Constructor methods
 

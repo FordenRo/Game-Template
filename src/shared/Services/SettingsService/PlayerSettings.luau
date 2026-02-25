@@ -30,12 +30,12 @@ export type SettingConfig<T> = {
 	Index: number,
 }
 
-export type PlayerSettings = setmetatable<{
+export type PlayerSettings = {
 	asTable: (self: Self) -> SettingsTable,
 	Serialize: (self: Self) -> BitBuffer.BitBuffer,
-}, { __index: setmetatable<SettingsTable, { __index: Class.Class }> }>
+} & SettingsTable & Class.Class
 
-type Self = PlayerSettings
+type Self = {} & PlayerSettings
 
 function PlayerSettings.new(): PlayerSettings
 	local self: Self = Class(PlayerSettings)

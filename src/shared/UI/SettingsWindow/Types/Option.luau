@@ -10,10 +10,10 @@ local Trove = require("../../../Packages/Trove")
 local Option = { change = {} }
 Option.extends = Component
 
-export type Option = setmetatable<{
+export type Option = {
 	Value: number,
 	Expanded: boolean,
-}, { __index: Component.Component<{
+} & Component.Component<{
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
@@ -22,15 +22,15 @@ export type Option = setmetatable<{
 		Title: TextLabel,
 		ArrowHolder: { Arrow: ImageLabel } & Frame,
 	} & ImageButton,
-} & ImageButton> }>
+} & ImageButton>
 
-type Self = setmetatable<{
+type Self = {
 	trove: Trove.Trove,
 	menu: Frame,
 	lastValue: number,
 	config: SettingTypes.Option,
 	buttons: { TextButton },
-}, { __index: Option }>
+} & Option
 
 local function updateMenu(self: Self)
 	local option = self.Instance.Option

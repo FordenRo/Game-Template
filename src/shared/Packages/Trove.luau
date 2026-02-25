@@ -165,10 +165,7 @@ export type Trove = {
 	Destroy: (self: Trove) -> (),
 }
 
-type Self = setmetatable<
-	{ objects: { [any]: (any) -> () } },
-	{ __index: Trove }
->
+type Self = { objects: { [any]: (any) -> () } } & Trove
 
 --#endregion
 

@@ -18,19 +18,19 @@ end
 local SettingsWindow = { change = {} }
 SettingsWindow.extends = Component
 
-export type SettingsWindow = setmetatable<{
+export type SettingsWindow = {
 	CurrentTab: SettingTypes.Tab,
 
 	AddTab: (self: SettingsWindow, tab: SettingTypes.Tab, content: Frame) -> (),
 	HighlightSetting: (self: SettingsWindow, value: BaseSettingType) -> (),
 	Destroy: (self: SettingsWindow) -> (),
-}, { __index: Component.Component<{
+} & Component.Component<{
 	Content: ScrollingFrame,
 	Sidebar: {
 		Tabs: Frame,
 		Control: { Close: TextButton } & Frame,
 	} & Frame,
-} & Frame> }>
+} & Frame>
 
 type BaseSettingType = {
 	Type: string,
@@ -39,22 +39,14 @@ type BaseSettingType = {
 	Index: number,
 }
 
-type Self = setmetatable<
-	{
-		trove: Trove.Trove,
-		tabContents: { [SettingTypes.Tab]: Frame },
-		tabButtons: { [SettingTypes.Tab]: TabButton.TabButton },
-		lastTab: SettingTypes.Tab,
-		settings: {
-			[BaseSettingType]: setmetatable<
-				{ Value: any },
-				{ __index: Component.Component<Frame> }
-			>,
-		},
-		groups: { [SettingTypes.Group]: Group.Group },
-	},
-	{ __index: SettingsWindow }
->
+type Self = {
+	trove: Trove.Trove,
+	tabContents: { [SettingTypes.Tab]: Frame },
+	tabButtons: { [SettingTypes.Tab]: TabButton.TabButton },
+	lastTab: SettingTypes.Tab,
+	settings: { [BaseSettingType]: { Value: any } & Component.Component<Frame> },
+	groups: { [SettingTypes.Group]: Group.Group },
+} & SettingsWindow
 
 local function initTabs(self: Self)
 	self.tabContents = {}

@@ -33,185 +33,178 @@ BitBuffer.Sym.Base64 = BitBuffer.Sym.UPPER
 	.. "+/"
 --#endregion
 
-export type BitBuffer = setmetatable<
-	{
-		--- Current size in bits.
-		Size: number,
-		--- The internal buffer.
-		RawBuffer: buffer,
-		--- Current BitBuffer position.
-		Cursor: number,
+export type BitBuffer = {
+	--- Current size in bits.
+	Size: number,
+	--- The internal buffer.
+	RawBuffer: buffer,
+	--- Current BitBuffer position.
+	Cursor: number,
 
-		--- Writes an unsigned integer with size of 8 bits or `bitCount` if provided.
-		WriteUint: (self: BitBuffer, value: number, bitCount: number?) -> (),
-		--- Reads an unsigned integer with size of 8 bits or `bitCount` if provided.
-		ReadUint: (self: BitBuffer, bitCount: number?) -> number,
+	--- Writes an unsigned integer with size of 8 bits or `bitCount` if provided.
+	WriteUint: (self: BitBuffer, value: number, bitCount: number?) -> (),
+	--- Reads an unsigned integer with size of 8 bits or `bitCount` if provided.
+	ReadUint: (self: BitBuffer, bitCount: number?) -> number,
 
-		--- Writes an signed integer with size of 8 bits or `bitCount` if provided.
-		WriteInt: (self: Self, value: number, bitCount: number?) -> (),
-		--- Reads an signed integer with size of 8 bits or `bitCount` if provided.
-		ReadInt: (self: Self, bitCount: number?) -> number,
+	--- Writes an signed integer with size of 8 bits or `bitCount` if provided.
+	WriteInt: (self: Self, value: number, bitCount: number?) -> (),
+	--- Reads an signed integer with size of 8 bits or `bitCount` if provided.
+	ReadInt: (self: Self, bitCount: number?) -> number,
 
-		--- Writes a 1-bit boolean.
-		WriteBool: (self: BitBuffer, value: boolean) -> (),
-		--- Reads a 1-bit boolean.
-		ReadBool: (self: BitBuffer) -> boolean,
+	--- Writes a 1-bit boolean.
+	WriteBool: (self: BitBuffer, value: boolean) -> (),
+	--- Reads a 1-bit boolean.
+	ReadBool: (self: BitBuffer) -> boolean,
 
-		--- Writes a string without writing the length of it.
-		WriteStringRaw: (self: BitBuffer, value: string) -> (),
-		--- Reads a string from `length` bits.
-		ReadStringRaw: (self: BitBuffer, length: number) -> string,
+	--- Writes a string without writing the length of it.
+	WriteStringRaw: (self: BitBuffer, value: string) -> (),
+	--- Reads a string from `length` bits.
+	ReadStringRaw: (self: BitBuffer, length: number) -> string,
 
-		--[[
-			Writes a string with maximum length of 2 ^ `bitCount`.
+	--[[
+		Writes a string with maximum length of 2 ^ `bitCount`.
 
-			To read it, you must use `BitBuffer:ReadString()`.
-		]]
-		WriteString: (self: BitBuffer, value: string, bitCount: number?) -> (),
-		--[[
-			Reads a string with maximum length of 2 ^ `bitCount`.
+		To read it, you must use `BitBuffer:ReadString()`.
+	]]
+	WriteString: (self: BitBuffer, value: string, bitCount: number?) -> (),
+	--[[
+		Reads a string with maximum length of 2 ^ `bitCount`.
 
-			String must be written with `BitBuffer:WriteString()`.
-		]]
-		ReadString: (self: BitBuffer, bitCount: number?) -> string,
+		String must be written with `BitBuffer:WriteString()`.
+	]]
+	ReadString: (self: BitBuffer, bitCount: number?) -> string,
 
-		--- Writes a string with custom `symbols` sheet.
-		WriteSymStringRaw: (
-			self: BitBuffer,
-			value: string,
-			symbols: string
-		) -> (),
-		--- Reads a string from `length` bits with custom `symbols` sheet.
-		ReadSymStringRaw: (
-			self: BitBuffer,
-			symbols: string,
-			length: number
-		) -> string,
+	--- Writes a string with custom `symbols` sheet.
+	WriteSymStringRaw: (self: BitBuffer, value: string, symbols: string) -> (),
+	--- Reads a string from `length` bits with custom `symbols` sheet.
+	ReadSymStringRaw: (
+		self: BitBuffer,
+		symbols: string,
+		length: number
+	) -> string,
 
-		--[[
-			Writes a string with custom `symbols` sheet
-			with maximum length of 2 ^ `bitCount`.
+	--[[
+		Writes a string with custom `symbols` sheet
+		with maximum length of 2 ^ `bitCount`.
 
-			To read it, you must use `BitBuffer:ReadSymString()`.
-		]]
-		WriteSymString: (
-			self: BitBuffer,
-			value: string,
-			symbols: string,
-			bitCount: number?
-		) -> (),
-		--[[
-			Reads a string with custom `symbols` sheet
-			with maximum length of 2 ^ `bitCount`.
+		To read it, you must use `BitBuffer:ReadSymString()`.
+	]]
+	WriteSymString: (
+		self: BitBuffer,
+		value: string,
+		symbols: string,
+		bitCount: number?
+	) -> (),
+	--[[
+		Reads a string with custom `symbols` sheet
+		with maximum length of 2 ^ `bitCount`.
 
-			String must be written with `BitBuffer:WriteSymString()`.
-		]]
-		ReadSymString: (
-			self: BitBuffer,
-			symbols: string,
-			bitCount: number?
-		) -> string,
+		String must be written with `BitBuffer:WriteSymString()`.
+	]]
+	ReadSymString: (
+		self: BitBuffer,
+		symbols: string,
+		bitCount: number?
+	) -> string,
 
-		--- Writes a 32-bit player value.
-		WritePlayer: (self: BitBuffer, player: Player) -> (),
-		--- Reads a 32-bit player value.
-		ReadPlayer: (self: BitBuffer) -> Player,
+	--- Writes a 32-bit player value.
+	WritePlayer: (self: BitBuffer, player: Player) -> (),
+	--- Reads a 32-bit player value.
+	ReadPlayer: (self: BitBuffer) -> Player,
 
-		--- Writes a 32-bit float value.
-		WriteFloat: (self: BitBuffer, value: number) -> (),
-		--- Reads a 32-bit float value.
-		ReadFloat: (self: BitBuffer) -> number,
+	--- Writes a 32-bit float value.
+	WriteFloat: (self: BitBuffer, value: number) -> (),
+	--- Reads a 32-bit float value.
+	ReadFloat: (self: BitBuffer) -> number,
 
-		--- Writes a Color3 value with size of 24 bits or `bitCount` * 3 if provided.
-		WriteColor3: (self: BitBuffer, value: Color3, bitCount: number?) -> (),
-		--- Reads a Color3 value with size of 24 bits or `bitCount` * 3 if provided.
-		ReadColor3: (self: BitBuffer, bitCount: number?) -> Color3,
+	--- Writes a Color3 value with size of 24 bits or `bitCount` * 3 if provided.
+	WriteColor3: (self: BitBuffer, value: Color3, bitCount: number?) -> (),
+	--- Reads a Color3 value with size of 24 bits or `bitCount` * 3 if provided.
+	ReadColor3: (self: BitBuffer, bitCount: number?) -> Color3,
 
-		--- Writes an item of provided `enum`.
-		WriteEnumItem: (self: BitBuffer, enum: Enum, value: EnumItem) -> (),
-		--- Reads an item of provided `enum`.
-		ReadEnumItem: (self: BitBuffer, enum: Enum) -> EnumItem,
+	--- Writes an item of provided `enum`.
+	WriteEnumItem: (self: BitBuffer, enum: Enum, value: EnumItem) -> (),
+	--- Reads an item of provided `enum`.
+	ReadEnumItem: (self: BitBuffer, enum: Enum) -> EnumItem,
 
-		--- Writes a raw buffer. Basically just merges provided buffer.
-		WriteBufferRaw: (self: BitBuffer, value: buffer) -> (),
-		--- Reads a raw buffer from `bitCount` bits.
-		ReadBufferRaw: (self: BitBuffer, bitCount: number) -> buffer,
+	--- Writes a raw buffer. Basically just merges provided buffer.
+	WriteBufferRaw: (self: BitBuffer, value: buffer) -> (),
+	--- Reads a raw buffer from `bitCount` bits.
+	ReadBufferRaw: (self: BitBuffer, bitCount: number) -> buffer,
 
-		--[[
-			Writes a buffer with maximum size of 2 ^ `bitCount` bytes.
+	--[[
+		Writes a buffer with maximum size of 2 ^ `bitCount` bytes.
 
-			To read it, you must use `BitBuffer:ReadBuffer()`.
-		]]
-		WriteBuffer: (self: BitBuffer, value: buffer, bitCount: number?) -> (),
-		--[[
-			Reads a buffer with maximum size of 2 ^ `bitCount` bytes.
+		To read it, you must use `BitBuffer:ReadBuffer()`.
+	]]
+	WriteBuffer: (self: BitBuffer, value: buffer, bitCount: number?) -> (),
+	--[[
+		Reads a buffer with maximum size of 2 ^ `bitCount` bytes.
 
-			Buffer must be written with `BitBuffer:WriteBuffer()`.
-		]]
-		ReadBuffer: (self: BitBuffer, bitCount: number?) -> buffer,
+		Buffer must be written with `BitBuffer:WriteBuffer()`.
+	]]
+	ReadBuffer: (self: BitBuffer, bitCount: number?) -> buffer,
 
-		--[[
-			Writes a BitBuffer without writing the size of it.
-			Basically just merges provided BitBuffer.
-		]]
-		WriteBitBufferRaw: (self: BitBuffer, value: BitBuffer) -> (),
-		--[[
-			Reads a BitBuffer from `bitCount` bits.
+	--[[
+		Writes a BitBuffer without writing the size of it.
+		Basically just merges provided BitBuffer.
+	]]
+	WriteBitBufferRaw: (self: BitBuffer, value: BitBuffer) -> (),
+	--[[
+		Reads a BitBuffer from `bitCount` bits.
 
-			You cannot read a BitBuffer written with `BitBuffer:WriteBitBuffer()`.
-		]]
-		ReadBitBufferRaw: (self: BitBuffer, bitCount: number) -> BitBuffer,
+		You cannot read a BitBuffer written with `BitBuffer:WriteBitBuffer()`.
+	]]
+	ReadBitBufferRaw: (self: BitBuffer, bitCount: number) -> BitBuffer,
 
-		--[[
-			Writes a BitBuffer with maximum size of 2 ^ `bitCount`.
+	--[[
+		Writes a BitBuffer with maximum size of 2 ^ `bitCount`.
 
-			To read it, you must use `BitBuffer:ReadBitBuffer()`.
-		]]
-		WriteBitBuffer: (
-			self: BitBuffer,
-			value: BitBuffer,
-			bitCount: number?
-		) -> (),
-		--[[
-			Reads a BitBuffer with maximum size of 2 ^ `bitCount`.
+		To read it, you must use `BitBuffer:ReadBitBuffer()`.
+	]]
+	WriteBitBuffer: (
+		self: BitBuffer,
+		value: BitBuffer,
+		bitCount: number?
+	) -> (),
+	--[[
+		Reads a BitBuffer with maximum size of 2 ^ `bitCount`.
 
-			BitBuffer must be written with `BitBuffer:WriteBitBuffer()`.
-		]]
-		ReadBitBuffer: (self: BitBuffer, bitCount: number?) -> BitBuffer,
+		BitBuffer must be written with `BitBuffer:WriteBitBuffer()`.
+	]]
+	ReadBitBuffer: (self: BitBuffer, bitCount: number?) -> BitBuffer,
 
-		--- Shrinks the internal buffer to the real size.
-		Shrink: (self: BitBuffer) -> (),
+	--- Shrinks the internal buffer to the real size.
+	Shrink: (self: BitBuffer) -> (),
 
-		--[[
-			Returns the buffer. Additionally writes 3 bits in the start
-			to describe the bits offset of the size.
+	--[[
+		Returns the buffer. Additionally writes 3 bits in the start
+		to describe the bits offset of the size.
 
-			To convert it back, you must use `BitBuffer.fromBuffer()`.
-		]]
-		toBuffer: (self: BitBuffer) -> buffer,
-		--[[
-			Returns hex string without size offset.
-		]]
-		toRawHex: (self: BitBuffer) -> string,
-		--[[
-			Returns hex string with size offset in the first char
-			to describe the bits offset of the size.
+		To convert it back, you must use `BitBuffer.fromBuffer()`.
+	]]
+	toBuffer: (self: BitBuffer) -> buffer,
+	--[[
+		Returns hex string without size offset.
+	]]
+	toRawHex: (self: BitBuffer) -> string,
+	--[[
+		Returns hex string with size offset in the first char
+		to describe the bits offset of the size.
 
-			To convert it back, you must use `BitBuffer.fromHex()`.
-		]]
-		toHex: (self: BitBuffer) -> string,
-		--- Returns Base64 (RPC 4648) string without size offset.
-		toRawBase64: (self: BitBuffer) -> string,
-		--[[
-			Returns Base64 (RPC 4648) string with size offset in the first char
-			to describe the bits offset of the size.
+		To convert it back, you must use `BitBuffer.fromHex()`.
+	]]
+	toHex: (self: BitBuffer) -> string,
+	--- Returns Base64 (RPC 4648) string without size offset.
+	toRawBase64: (self: BitBuffer) -> string,
+	--[[
+		Returns Base64 (RPC 4648) string with size offset in the first char
+		to describe the bits offset of the size.
 
-			To convert it back, you must use `BitBuffer.fromBase64()`.
-		]]
-		toBase64: (self: BitBuffer) -> string,
-	},
-	{ __index: Class.Class }
->
+		To convert it back, you must use `BitBuffer.fromBase64()`.
+	]]
+	toBase64: (self: BitBuffer) -> string,
+} & Class.Class
 
 type Self = BitBuffer
 

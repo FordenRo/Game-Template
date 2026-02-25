@@ -10,30 +10,27 @@ local math = math
 local BitPacket = {}
 BitPacket.extends = Class
 
-export type BitPacket<V> = typeof(setmetatable(
-	{} :: {
-		--- Writes the value to provided BitBuffer.
-		Write: (self: BitPacket<V>, bb: BitBuffer.BitBuffer, value: V) -> (),
-		--- Reads the value from provided BitBuffer.
-		Read: (self: BitPacket<V>, bb: BitBuffer.BitBuffer) -> V,
+export type BitPacket<V> = {
+	--- Writes the value to provided BitBuffer.
+	Write: (self: BitPacket<V>, bb: BitBuffer.BitBuffer, value: V) -> (),
+	--- Reads the value from provided BitBuffer.
+	Read: (self: BitPacket<V>, bb: BitBuffer.BitBuffer) -> V,
 
-		--- Creates BitBuffer and writes provided value to it. Returns the BitBuffer.
-		Serialize: (self: BitPacket<V>, value: V) -> BitBuffer.BitBuffer,
-		--- Reads the value from provided BitBuffer.
-		Deserialize: (self: BitPacket<V>, bb: BitBuffer.BitBuffer) -> V,
-	},
-	{} :: { __index: Class.Class }
-))
+	--- Creates BitBuffer and writes provided value to it. Returns the BitBuffer.
+	Serialize: (self: BitPacket<V>, value: V) -> BitBuffer.BitBuffer,
+	--- Reads the value from provided BitBuffer.
+	Deserialize: (self: BitPacket<V>, bb: BitBuffer.BitBuffer) -> V,
+} & Class.Class
 
 type Deserializable<T> = {
 	deserialize: (bb: BitBuffer.BitBuffer) -> T,
 }
 
-type Self = setmetatable<{
+type Self = {
 	_write: (bb: BitBuffer.BitBuffer, value: any) -> (),
 	_read: (bb: BitBuffer.BitBuffer) -> any,
 	size: number?,
-}, { __index: BitPacket<any> }>
+} & BitPacket<any>
 
 function BitPacket.new<V>(
 	write: (bb: BitBuffer.BitBuffer, value: V) -> (),

@@ -7,10 +7,12 @@ local SettingTypes = require("../../Services/SettingsService/SettingTypes")
 local TabButton = { change = {} }
 TabButton.extends = Component
 
-export type TabButton = setmetatable<{
+export type TabButton = {
 	Selected: boolean,
 	Activated: RBXScriptSignal,
-}, { __index: Component.Component<{ UIStroke: UIStroke } & TextButton> }>
+} & Component.Component<
+	{ UIStroke: UIStroke } & TextButton
+>
 
 type Self = TabButton
 
