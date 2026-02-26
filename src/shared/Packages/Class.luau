@@ -171,7 +171,7 @@ function Class.new<S>(source: S?): S & Class
 end
 
 function Class.isClass(obj: any): boolean
-	return typeof(obj) == "table" and getmetatable(obj) == Class
+	return typeof(obj) == "table" and getmetatable(obj) == ClassMeta
 end
 
 function Class.GetPropertyChangedSignal(self: Self, property: string)
