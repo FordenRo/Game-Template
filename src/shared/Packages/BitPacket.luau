@@ -233,7 +233,7 @@ function BitPacket.Array<T>(
 			BitPacket.FixedArray(item, #value):Write(bb, value)
 		end,
 		function(bb: BitBuffer.BitBuffer)
-			BitPacket.FixedArray(item, bb:ReadUint(bitCount)):Read(bb)
+			return BitPacket.FixedArray(item, bb:ReadUint(bitCount)):Read(bb)
 		end,
 		item.size
 	)
