@@ -174,6 +174,7 @@ BitPacket.Float = BitPacket.new(
 ) :: BitPacket<number>
 
 function BitPacket.Color3(bitCount: number?): BitPacket<Color3>
+	bitCount = bitCount or 8
 	return BitPacket.new(
 		function(bb: BitBuffer.BitBuffer, value) bb:WriteColor3(value, bitCount) end,
 		function(bb: BitBuffer.BitBuffer) return bb:ReadColor3(bitCount) end,
