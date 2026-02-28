@@ -308,7 +308,10 @@ function Array.__mul<V>(self: Array<V>, v: number): Array<V>
 end
 
 function Array.__tostring(self: Self)
-	return `Array({table.concat(self.__table, ", ")})`
+	return `Array({table.concat(
+		self:Mapped(function(v) return tostring(v) end).__table,
+		", "
+	)})`
 end
 
 --#endregion

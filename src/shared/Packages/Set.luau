@@ -165,7 +165,10 @@ function Set.__len(self: Self) return #self:toList() end
 function Set.__iter(self: Self) return next, self:toList() end
 
 function Set.__tostring(self: Self)
-	return `Set({table.concat(self:toList(), ", ")})`
+	return `Set({table.concat(
+		self:Mapped(function(v) return tostring(v) end):toList(),
+		", "
+	)})`
 end
 
 --#endregion
