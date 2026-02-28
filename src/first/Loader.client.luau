@@ -1,6 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 if not game:IsLoaded() then game.Loaded:Wait() end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 for _, controller in ReplicatedStorage.Shared.Controllers:GetChildren() do
 	if controller:IsA("ModuleScript") then

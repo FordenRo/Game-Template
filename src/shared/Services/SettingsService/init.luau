@@ -49,27 +49,6 @@ function initClient(self: Self)
 	)
 end
 
-function SettingsService.onServerReceived(
-	self: Self,
-	player: Player,
-	key: string,
-	value: any
-)
-	settings[player]:RawSet(key, value)
-end
-
-function SettingsService.onClientReceived(
-	self: Self,
-	key: string,
-	value: any
-)
-	self.Settings:RawSet(key, value)
-end
-
-function SettingsService.onServerInvoked(self: Self, player: Player)
-	return self:GetPlayerSettings(player):Serialize():toBase64()
-end
-
 function SettingsService.GetPlayerSettings(self: Self, player: Player)
 	assert(
 		RunService:IsServer(),
@@ -113,5 +92,30 @@ function SettingsService.GetPlayerSettings(self: Self, player: Player)
 
 	return playerSettings
 end
+
+--#region Replication
+
+function SettingsService.onServerReceived(
+	self: Self,
+	player: Player,
+	key: string,
+	value: any
+)
+	settings[player]:RawSet(key, value)
+end
+
+function SettingsService.onClientReceived(
+	self: Self,
+	key: string,
+	value: any
+)
+	self.Settings:RawSet(key, value)
+end
+
+function SettingsService.onServerInvoked(self: Self, player: Player)
+	return self:GetPlayerSettings(player):Serialize():toBase64()
+end
+
+--#endregion
 
 return SettingsService.new()
