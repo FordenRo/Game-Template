@@ -6,6 +6,7 @@ local BitBuffer = require("../Packages/BitBuffer")
 local Class = require("../Packages/Class")
 local PlayerSettings = require("@self/PlayerSettings")
 local Replicated = require("../Packages/Replicated")
+local TryCall = require("../Packages/TryCall")
 
 local SettingsService = {}
 SettingsService.extends = Class
@@ -58,13 +59,23 @@ function SettingsService.GetPlayerSettings(self: Self, player: Player)
 	local playerSettings = settings[player]
 	if not playerSettings then
 		local datastore = DataStoreService:GetDataStore("Settings")
-		local data = datastore:GetAsync(tostring(player.UserId))
-		if data then
-			playerSettings =
-				PlayerSettings.deserialize(BitBuffer.fromBase64(data))
-		else
-			playerSettings = PlayerSettings.new()
-		end
+		TryCall(
+			function() return datastore:GetAsync(tostring(player.UserId)) end,
+			function(data)
+				if data then
+					playerSettings =
+						PlayerSettings.deserialize(BitBuffer.fromBase64(data))
+				else
+					playerSettings = PlayerSettings.new()
+				end
+			end,
+			function(err)
+				warn(err)
+				playerSettings = PlayerSettings.new()
+			end,
+			3,
+			300
+		)
 		settings[player] = playerSettings
 	end
 
@@ -78,9 +89,17 @@ function SettingsService.GetPlayerSettings(self: Self, player: Player)
 
 		local datastore = DataStoreService:GetDataStore("Settings")
 		if playerSettings:asTable() ~= self.DefaultSettings:asTable() then
-			datastore:SetAsync(
-				tostring(player.UserId),
-				playerSettings:Serialize():toBase64()
+			TryCall(
+				function()
+					datastore:SetAsync(
+						tostring(player.UserId),
+						playerSettings:Serialize():toBase64()
+					)
+				end,
+				nil,
+				warn,
+				3,
+				1000
 			)
 		else
 			datastore:RemoveAsync(tostring(player.UserId))
