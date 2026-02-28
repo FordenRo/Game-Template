@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 
-local Component = require("../Packages/Component")
+local Component = require("../../Packages/Component")
 
 --#region Constants
 local CORE_PROPERTIES = {
@@ -32,12 +32,12 @@ local CORE_GUI_PROPERTIES = {
 }
 --#endregion
 
-local InterfaceController = { get = {}, set = {}, change = {} }
-InterfaceController.extends = Component
+local BaseInterfaceController = { get = {}, set = {}, change = {} }
+BaseInterfaceController.extends = Component
 
 --#region Types
 
-export type InterfaceController = setmetatable<
+export type BaseInterfaceController = setmetatable<
 	{
 		--- Toggles the visibility of the interface.
 		Enabled: boolean,
@@ -45,16 +45,16 @@ export type InterfaceController = setmetatable<
 		CurrentWindow: GuiObject?,
 
 		--- Adds `GuiObject` to the interface.
-		Add: (self: InterfaceController, object: GuiObject) -> (),
+		Add: (self: BaseInterfaceController, object: GuiObject) -> (),
 
 		--- Returns a list of all `GuiObject` instances occupying the given position on the screen.
 		GetGuiObjectsAtPosition: (
-			self: InterfaceController,
+			self: BaseInterfaceController,
 			position: Vector2
 		) -> { GuiObject },
 		--- Returns a list of all `GuiObject` instances occupying the circle at the given position of the radius.
 		GetGuiObjectsInCircle: (
-			self: InterfaceController,
+			self: BaseInterfaceController,
 			position: Vector2,
 			radius: number
 		) -> { GuiObject },
@@ -101,18 +101,24 @@ export type InterfaceController = setmetatable<
 
 		--- Prompts the current player to send a connection request to the given Player.
 		PromptSendFriendRequest: (
-			self: InterfaceController,
+			self: BaseInterfaceController,
 			player: Player
 		) -> (),
 		--- Prompts the current player to remove a given Player from their connections list.
-		PromptUnfriend: (self: InterfaceController, player: Player) -> (),
+		PromptUnfriend: (self: BaseInterfaceController, player: Player) -> (),
 		--- Prompts the current player to block the given Player.
-		PromptBlockPlayer: (self: InterfaceController, player: Player) -> (),
+		PromptBlockPlayer: (
+			self: BaseInterfaceController,
+			player: Player
+		) -> (),
 		--- Prompts the current player to unblock the given Player.
-		PromptUnblockPlayer: (self: InterfaceController, player: Player) -> (),
+		PromptUnblockPlayer: (
+			self: BaseInterfaceController,
+			player: Player
+		) -> (),
 		--- Causes a non-intrusive notification to appear at the bottom right of the screen. The notification may have up to two buttons.
 		SendNotification: (
-			self: InterfaceController,
+			self: BaseInterfaceController,
 			title: string,
 			text: string,
 			props: NotificationProperties?
@@ -124,7 +130,7 @@ export type InterfaceController = setmetatable<
 type Self = setmetatable<{
 	windowConn: RBXScriptConnection?,
 	lastWindow: GuiObject?,
-}, { __index: InterfaceController }>
+}, { __index: BaseInterfaceController }>
 
 type NotificationProperties = {
 	--- The image to display with the notification.
@@ -141,13 +147,13 @@ type NotificationProperties = {
 
 --#endregion
 
-function InterfaceController.new(): InterfaceController
+function BaseInterfaceController.new(): BaseInterfaceController
 	local screen = Instance.new("ScreenGui")
 	screen.Name = "Interface"
 	screen.Enabled = false
 	screen.Parent = Players.LocalPlayer.PlayerGui
 
-	local self: Self = Component(screen, InterfaceController)
+	local self: Self = Component(screen, BaseInterfaceController)
 
 	self.Enabled = false
 
@@ -156,11 +162,11 @@ function InterfaceController.new(): InterfaceController
 	return self
 end
 
-function InterfaceController.change.Enabled(self: Self)
+function BaseInterfaceController.change.Enabled(self: Self)
 	self.Instance.Enabled = self.Enabled
 end
 
-function InterfaceController.change.CurrentWindow(self: Self)
+function BaseInterfaceController.change.CurrentWindow(self: Self)
 	if self.windowConn then
 		self.windowConn:Disconnect()
 		self.windowConn = nil
@@ -175,11 +181,11 @@ function InterfaceController.change.CurrentWindow(self: Self)
 	end
 end
 
-function InterfaceController.Add(self: Self, object: GuiObject)
+function BaseInterfaceController.Add(self: Self, object: GuiObject)
 	object.Parent = self.Instance
 end
 
-function InterfaceController.GetGuiObjectsAtPosition(
+function BaseInterfaceController.GetGuiObjectsAtPosition(
 	self: Self,
 	position: Vector2
 )
@@ -189,7 +195,7 @@ function InterfaceController.GetGuiObjectsAtPosition(
 	)
 end
 
-function InterfaceController.GetGuiObjectsInCircle(
+function BaseInterfaceController.GetGuiObjectsInCircle(
 	self: Self,
 	position: Vector2,
 	radius: number
@@ -197,7 +203,7 @@ function InterfaceController.GetGuiObjectsInCircle(
 	return Players.LocalPlayer.PlayerGui:GetGuiObjectsInCircle(position, radius)
 end
 
-function InterfaceController.SendNotification(
+function BaseInterfaceController.SendNotification(
 	self: Self,
 	title: string,
 	text: string,
@@ -216,7 +222,7 @@ function InterfaceController.SendNotification(
 	StarterGui:SetCore("SendNotification", props)
 end
 
-function InterfaceController.change.ResetButtonCallback(self: Self)
+function BaseInterfaceController.change.ResetButtonCallback(self: Self)
 	local value = self.ResetButtonCallback
 	if typeof(self.ResetButtonCallback) == "function" then
 		local event = Instance.new("BindableEvent")
@@ -228,28 +234,28 @@ end
 
 --#region Bind properties
 for _, prop in CORE_PROPERTIES do
-	InterfaceController.get[prop] = function(self: Self)
+	BaseInterfaceController.get[prop] = function(self: Self)
 		return StarterGui:GetCore(prop)
 	end
-	InterfaceController.set[prop] = function(self: Self, v: any)
+	BaseInterfaceController.set[prop] = function(self: Self, v: any)
 		return StarterGui:SetCore(prop, v)
 	end
 end
 
 for _, callback in CORE_FUNCTIONS do
-	InterfaceController[callback] = function(self: Self, ...)
+	BaseInterfaceController[callback] = function(self: Self, ...)
 		StarterGui:SetCore(callback, ...)
 	end
 end
 
 for prop, coreGui in CORE_GUI_PROPERTIES do
-	InterfaceController.get[prop] = function(self: Self)
+	BaseInterfaceController.get[prop] = function(self: Self)
 		return StarterGui:GetCoreGuiEnabled(coreGui)
 	end
-	InterfaceController.set[prop] = function(self: Self, v: boolean)
+	BaseInterfaceController.set[prop] = function(self: Self, v: boolean)
 		StarterGui:SetCoreGuiEnabled(coreGui, v)
 	end
 end
 --#endregion
 
-return InterfaceController.new()
+return BaseInterfaceController.new()
