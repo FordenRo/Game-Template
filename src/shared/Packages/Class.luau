@@ -258,13 +258,11 @@ function Class.__eq(self: Self, obj: any)
 end
 
 function Class.__tostring(self: Self)
-	if not next(self.__table) then return "Class()" end
-
-	local str = "\n"
+	local fields = {}
 	for k, v in self.__table do
-		str ..= `\t{k} = {tostring(v)}\n`
+		table.insert(fields, `\t{tostring(k)} = {tostring(v)}`)
 	end
-	return `Class({str})`
+	return `Class({table.concat(fields, "\n")})`
 end
 
 --#endregion

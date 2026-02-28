@@ -188,13 +188,11 @@ function Dictionary.__concat<V, A>(self: Dictionary<V>, obj: { A }): Dictionary<
 end
 
 function Dictionary.__tostring(self: Self)
-	if self.IsEmpty then return "Dictionary()" end
-
-	local str = "\n"
+	local fields = {}
 	for k, v in self do
-		str ..= `\t{tostring(k)} = {tostring(v)}\n`
+		table.insert(fields, `{tostring(k)} = {tostring(v)}`)
 	end
-	return `Dictionary({str})`
+	return `Dictionary({table.concat(fields, "\n")})`
 end
 
 --#endregion
