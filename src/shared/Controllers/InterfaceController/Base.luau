@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 
+local Class = require("../../Packages/Class")
 local Component = require("../../Packages/Component")
 
 --#region Constants
@@ -45,7 +46,10 @@ export type BaseInterfaceController = setmetatable<
 		CurrentWindow: GuiObject?,
 
 		--- Adds `GuiObject` to the interface.
-		Add: (self: BaseInterfaceController, object: GuiObject) -> (),
+		Add: (
+			self: BaseInterfaceController,
+			object: Instance | Component.Component<Instance>
+		) -> (),
 
 		--- Returns a list of all `GuiObject` instances occupying the given position on the screen.
 		GetGuiObjectsAtPosition: (
@@ -181,8 +185,19 @@ function BaseInterfaceController.change.CurrentWindow(self: Self)
 	end
 end
 
-function BaseInterfaceController.Add(self: Self, object: GuiObject)
-	object.Parent = self.Instance
+function BaseInterfaceController.Add(
+	self: Self,
+	object: Instance | Component.Component<Instance>
+)
+	if Class.isClass(object) and object:IsA(Component) then
+		object = (object :: Component.Component<Instance>).Instance
+	end
+
+	if typeof(object) == "Instance" then
+		object.Parent = self.Instance
+		return
+	end
+	error("The object must be of type Instance or Component")
 end
 
 function BaseInterfaceController.GetGuiObjectsAtPosition(
