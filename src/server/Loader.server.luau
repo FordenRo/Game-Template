@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local TryCall = require("../shared/Packages/TryCall")
+local TryCall = require(ReplicatedStorage.Shared.Packages.TryCall)
 
 for _, handler in script.Parent.Handlers:GetChildren() do
 	if handler:IsA("ModuleScript") then

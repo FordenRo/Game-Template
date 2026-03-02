@@ -2,7 +2,7 @@ if not game:IsLoaded() then game.Loaded:Wait() end
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local TryCall = require("../shared/Packages/TryCall")
+local TryCall = require(ReplicatedStorage.Shared.Packages.TryCall)
 
 for _, controller in ReplicatedStorage.Shared.Controllers:GetChildren() do
 	if controller:IsA("ModuleScript") then
