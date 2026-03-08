@@ -199,7 +199,30 @@ do -- Packet
 	})
 
 	local function ActionPacket(action: ActionConfig)
-		return BitPacket.Array(BindingPacket, 5)
+		return BitPacket.new(
+			function(bb: BitBuffer.BitBuffer, value: InputAction)
+				local bindings: Array.Array<InputBinding> = Array.fromTable(
+					value:GetChildren()
+				)
+					:Filtered(function(v) return v:IsA("InputBinding") end)
+					:Sorted(
+						function(a, b)
+							return tonumber(a.Name) < tonumber(b.Name)
+						end
+					)
+				for _, v in bindings do
+					BindingPacket:Write(bb, v)
+				end
+			end,
+			function(bb: BitBuffer.BitBuffer)
+				local t = {}
+				for i = 1, #action.Bindings do
+					table.insert(t, BindingPacket:Read(bb))
+				end
+				return t
+			end,
+			BindingPacket.Size * #action.Bindings
+		)
 	end
 
 	local function ContextPacket(context: InputConfig)
