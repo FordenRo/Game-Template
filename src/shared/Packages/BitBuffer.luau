@@ -305,6 +305,7 @@ function BitBuffer.fromBase64(s: string): BitBuffer
 		self:WriteUint(charset:find(s:sub(u, u)) - 1, tail)
 	end
 
+	self.Cursor = 0
 	return self
 end
 
