@@ -16,6 +16,8 @@ InputService.implements = { Replicated }
 
 local Packet
 
+--#region Types
+
 type function InputsReturnType(
 	config: type,
 	context: type,
@@ -60,13 +62,13 @@ type InputConfig = {
 	Actions: { [string]: ActionConfig },
 }
 
-export type InputService = setmetatable<{
+export type InputService = {
 	GetStringForAction: (self: InputService, action: InputAction) -> string,
-}, {
-	__index: setmetatable<InputsTable, { __index: Class.Class }>,
-}>
+} & InputsTable & Class.Class
 
-type Self = setmetatable<Replicated.Replicated, { __index: InputService }>
+type Self = Replicated.Replicated & InputService
+
+--#endregion
 
 function InputService.new(): InputService
 	local self: Self = Class(InputService)
@@ -78,7 +80,12 @@ function InputService.new(): InputService
 end
 
 local function getInputs(self: Self)
-	return Packet:Deserialize(BitBuffer.fromBase64(self:InvokeServer()))
+	local data = self:InvokeServer()
+	if data then
+		return Packet:Deserialize(BitBuffer.fromBase64(data))
+	else
+		return {}
+	end
 end
 
 function initClient(self: Self)
@@ -115,7 +122,7 @@ function initClient(self: Self)
 	end)
 end
 
-do
+do -- GetStringForAction method
 	local ACTION_TYPE_MAP = {
 		[Enum.InputActionType.Bool] = { "KeyCode" },
 		[Enum.InputActionType.Direction1D] = { "Up", "Down" },
@@ -147,6 +154,8 @@ do
 	end
 end
 
+--#region Replication
+
 function InputService.onServerReceived(self: Self, player: Player, b: buffer)
 	local datastore = DataStoreService:GetDataStore("Inputs")
 	datastore:SetAsync(tostring(player.UserId), b)
@@ -154,10 +163,11 @@ end
 
 function InputService.onServerInvoked(self: Self, player: Player)
 	local datastore = DataStoreService:GetDataStore("Inputs")
-	return datastore:GetAsync(tostring(player.UserId))
 end
 
-do
+--#endregion
+
+do -- Packet
 	local OptionalKeyCodePacket =
 		BitPacket.Optional(BitPacket.EnumItem(Enum.KeyCode))
 	local BindingPacket = BitPacket.Packet({
@@ -170,9 +180,11 @@ do
 		Backward = OptionalKeyCodePacket,
 	})
 
-	local function ActionPacket(action) return BitPacket.Array(BindingPacket) end
+	local function ActionPacket(action: ActionConfig)
+		return BitPacket.Array(BindingPacket, 5)
+	end
 
-	local function ContextPacket(context)
+	local function ContextPacket(context: InputConfig)
 		local actions: Array.Array<{ Key: string, Value: ActionConfig }> =
 			Array()
 		for k, v in context.Actions do
@@ -182,51 +194,57 @@ do
 			function(a, b) return a.Value.Id < b.Value.Id end
 		)
 
-		return BitPacket.new(function(bb: BitBuffer.BitBuffer, value)
-			for _, v in actions do
-				bb:WriteBool(true)
-				ActionPacket(v.Value.Bindings):Write(bb, value)
+		return BitPacket.new(
+			function(bb: BitBuffer.BitBuffer, value: InputContext)
+				for _, v in actions do
+					bb:WriteBool(true)
+					ActionPacket(v.Value):Write(bb, value[v.Key])
+				end
+				bb:WriteBool(false)
+			end,
+			function(bb: BitBuffer.BitBuffer)
+				local t = {}
+				for _, v in actions do
+					if not bb:ReadBool() then break end
+					t[v.Key] = ActionPacket(v.Value):Read(bb)
+				end
+				return t
 			end
-			bb:WriteBool(false)
-		end, function(bb: BitBuffer.BitBuffer)
-			local t = {}
-			for _, v in actions do
-				if not bb:ReadBool() then break end
-				t[v.Key] = ActionPacket(v.Value):Read(bb)
-			end
-			return t
-		end)
+		)
 	end
 
-	Packet = BitPacket.new(function(bb: BitBuffer.BitBuffer, value)
-		local mappedConfig: Array.Array<{ Key: string, Value: InputConfig }> =
-			Array()
-		for k, v in InputsConfig do
-			mappedConfig:Add({ Key = k, Value = v })
-		end
-		mappedConfig = mappedConfig:Sorted(
-			function(a, bb) return a.Value.Id < bb.Value.Id end
-		)
+	Packet = BitPacket.new(
+		function(bb: BitBuffer.BitBuffer, value: InputService)
+			local mappedConfig: Array.Array<{ Key: string, Value: InputConfig }> =
+				Array()
+			for k, v in InputsConfig do
+				mappedConfig:Add({ Key = k, Value = v })
+			end
+			mappedConfig = mappedConfig:Sorted(
+				function(a, bb) return a.Value.Id < bb.Value.Id end
+			)
 
-		for _, v in mappedConfig do
-			ContextPacket(v.Value):Write(bb, value)
-		end
-	end, function(bb: BitBuffer.BitBuffer)
-		local t = {}
-		local mappedConfig: Array.Array<{ Key: string, Value: InputConfig }> =
-			Array()
-		for k, v in InputsConfig do
-			mappedConfig:Add({ Key = k, Value = v })
-		end
-		mappedConfig = mappedConfig:Sorted(
-			function(a, b) return a.Value.Id < b.Value.Id end
-		)
+			for _, v in mappedConfig do
+				ContextPacket(v.Value):Write(bb, value[v.Key])
+			end
+		end,
+		function(bb: BitBuffer.BitBuffer)
+			local t = {}
+			local mappedConfig: Array.Array<{ Key: string, Value: InputConfig }> =
+				Array()
+			for k, v in InputsConfig do
+				mappedConfig:Add({ Key = k, Value = v })
+			end
+			mappedConfig = mappedConfig:Sorted(
+				function(a, b) return a.Value.Id < b.Value.Id end
+			)
 
-		for _, v in mappedConfig do
-			t[v.Key] = ContextPacket(v.Value.Actions):Read(bb)
+			for _, v in mappedConfig do
+				t[v.Key] = ContextPacket(v.Value.Actions):Read(bb)
+			end
+			return t
 		end
-		return t
-	end)
+	)
 end
 
 return InputService.new()
