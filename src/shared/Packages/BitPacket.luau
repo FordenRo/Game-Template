@@ -2,6 +2,8 @@
 local BitBuffer = require("./BitBuffer")
 local Class = require("./Class")
 
+type BitBuffer = BitBuffer.BitBuffer
+
 -- Preload globals
 local table = table
 local pcall = pcall
@@ -12,60 +14,57 @@ BitPacket.extends = Class
 
 export type BitPacket<V> = {
 	--- Writes the value to provided BitBuffer.
-	Write: (self: BitPacket<V>, bb: BitBuffer.BitBuffer, value: V) -> (),
+	Write: (self: BitPacket<V>, bb: BitBuffer, value: V) -> (),
 	--- Reads the value from provided BitBuffer.
-	Read: (self: BitPacket<V>, bb: BitBuffer.BitBuffer) -> V,
+	Read: (self: BitPacket<V>, bb: BitBuffer) -> V,
+	--- Size of the packet in bits.
+	Size: number?,
 
 	--- Creates BitBuffer and writes provided value to it. Returns the BitBuffer.
-	Serialize: (self: BitPacket<V>, value: V) -> BitBuffer.BitBuffer,
+	Serialize: (self: BitPacket<V>, value: V) -> BitBuffer,
 	--- Reads the value from provided BitBuffer.
-	Deserialize: (self: BitPacket<V>, bb: BitBuffer.BitBuffer) -> V,
+	Deserialize: (self: BitPacket<V>, bb: BitBuffer) -> V,
 } & Class.Class
 
 type Deserializable<T> = {
-	deserialize: (bb: BitBuffer.BitBuffer) -> T,
+	deserialize: (bb: BitBuffer) -> T,
 }
 
 type Self = {
-	_write: (bb: BitBuffer.BitBuffer, value: any) -> (),
-	_read: (bb: BitBuffer.BitBuffer) -> any,
-	size: number?,
+	_write: (bb: BitBuffer, value: any) -> (),
+	_read: (bb: BitBuffer) -> any,
 } & BitPacket<any>
 
 function BitPacket.new<V>(
-	write: (bb: BitBuffer.BitBuffer, value: V) -> (),
-	read: (bb: BitBuffer.BitBuffer) -> V,
+	write: (bb: BitBuffer, value: V) -> (),
+	read: (bb: BitBuffer) -> V,
 	size: number?
 ): BitPacket<V>
 	local self: Self = Class(BitPacket)
 
 	self._write = write
 	self._read = read
-	self.size = size
+	self.Size = size
 
 	return self
 end
 
-function BitPacket.Write(self: Self, bb: BitBuffer.BitBuffer, value: any)
+function BitPacket.Write(self: Self, bb: BitBuffer, value: any)
 	self._write(bb, value)
 end
 
-function BitPacket.Read(self: Self, bb: BitBuffer.BitBuffer)
-	return self._read(bb)
-end
+function BitPacket.Read(self: Self, bb: BitBuffer) return self._read(bb) end
 
 function BitPacket.Serialize(self: Self, value: any)
-	local bb = BitBuffer.new(self.size and math.floor(self.size / 8))
+	local bb = BitBuffer.new(self.Size and math.floor(self.Size / 8))
 	self:Write(bb, value)
 	bb:Shrink()
 	return bb
 end
 
-function BitPacket.Deserialize(self: Self, bb: BitBuffer.BitBuffer)
-	return self:Read(bb)
-end
+function BitPacket.Deserialize(self: Self, bb: BitBuffer) return self:Read(bb) end
 
-local function writeObject(bb: BitBuffer.BitBuffer, base: any, value: any)
+local function writeObject(bb: BitBuffer, base: any, value: any)
 	if Class.isClass(base) and (base :: Class.Class):IsA(BitPacket) then
 		(base :: BitPacket<any>):Write(bb, value)
 		return
@@ -78,7 +77,7 @@ local function writeObject(bb: BitBuffer.BitBuffer, base: any, value: any)
 	bb:WriteBitBufferRaw(value:Serialize())
 end
 
-local function readObject(bb: BitBuffer.BitBuffer, base: any)
+local function readObject(bb: BitBuffer, base: any)
 	if Class.isClass(base) and (base :: Class.Class):IsA(BitPacket) then
 		return (base :: BitPacket<any>):Read(bb)
 	end
@@ -118,30 +117,30 @@ end
 
 function BitPacket.Uint(bitCount: number?): BitPacket<number>
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value) bb:WriteUint(value, bitCount) end,
-		function(bb: BitBuffer.BitBuffer) return bb:ReadUint(bitCount) end,
+		function(bb: BitBuffer, value) bb:WriteUint(value, bitCount) end,
+		function(bb: BitBuffer) return bb:ReadUint(bitCount) end,
 		bitCount
 	)
 end
 
 function BitPacket.Int(bitCount: number?): BitPacket<number>
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value) bb:WriteInt(value, bitCount) end,
-		function(bb: BitBuffer.BitBuffer) return bb:ReadInt(bitCount) end,
+		function(bb: BitBuffer, value) bb:WriteInt(value, bitCount) end,
+		function(bb: BitBuffer) return bb:ReadInt(bitCount) end,
 		bitCount
 	)
 end
 
 BitPacket.Bool = BitPacket.new(
-	function(bb: BitBuffer.BitBuffer, value) bb:WriteBool(value) end,
-	function(bb: BitBuffer.BitBuffer) return bb:ReadBool() end,
+	function(bb: BitBuffer, value) bb:WriteBool(value) end,
+	function(bb: BitBuffer) return bb:ReadBool() end,
 	1
 ) :: BitPacket<boolean>
 
 function BitPacket.String(bitCount: number?): BitPacket<string>
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value) bb:WriteString(value, bitCount) end,
-		function(bb: BitBuffer.BitBuffer) return bb:ReadString(bitCount) end,
+		function(bb: BitBuffer, value) bb:WriteString(value, bitCount) end,
+		function(bb: BitBuffer) return bb:ReadString(bitCount) end,
 		bitCount
 	)
 end
@@ -151,33 +150,31 @@ function BitPacket.SymString(
 	bitCount: number?
 ): BitPacket<string>
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value)
+		function(bb: BitBuffer, value)
 			bb:WriteSymString(value, symbols, bitCount)
 		end,
-		function(bb: BitBuffer.BitBuffer)
-			return bb:ReadSymString(symbols, bitCount)
-		end,
+		function(bb: BitBuffer) return bb:ReadSymString(symbols, bitCount) end,
 		bitCount
 	)
 end
 
 BitPacket.Player = BitPacket.new(
-	function(bb: BitBuffer.BitBuffer, value) bb:WritePlayer(value) end,
-	function(bb: BitBuffer.BitBuffer) return bb:ReadPlayer() end,
+	function(bb: BitBuffer, value) bb:WritePlayer(value) end,
+	function(bb: BitBuffer) return bb:ReadPlayer() end,
 	32
 ) :: BitPacket<Player>
 
 BitPacket.Float = BitPacket.new(
-	function(bb: BitBuffer.BitBuffer, value) bb:WriteFloat(value) end,
-	function(bb: BitBuffer.BitBuffer) return bb:ReadFloat() end,
+	function(bb: BitBuffer, value) bb:WriteFloat(value) end,
+	function(bb: BitBuffer) return bb:ReadFloat() end,
 	32
 ) :: BitPacket<number>
 
 function BitPacket.Color3(bitCount: number?): BitPacket<Color3>
 	bitCount = bitCount or 8
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value) bb:WriteColor3(value, bitCount) end,
-		function(bb: BitBuffer.BitBuffer) return bb:ReadColor3(bitCount) end,
+		function(bb: BitBuffer, value) bb:WriteColor3(value, bitCount) end,
+		function(bb: BitBuffer) return bb:ReadColor3(bitCount) end,
 		bitCount * 3
 	)
 end
@@ -185,10 +182,8 @@ end
 function BitPacket.EnumItem(enum: Enum): BitPacket<EnumItem>
 	local _, bitCount = math.frexp(#enum:GetEnumItems())
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value: EnumItem)
-			bb:WriteEnumItem(enum, value)
-		end,
-		function(bb: BitBuffer.BitBuffer) return bb:ReadEnumItem(enum) end,
+		function(bb: BitBuffer, value: EnumItem) bb:WriteEnumItem(enum, value) end,
+		function(bb: BitBuffer) return bb:ReadEnumItem(enum) end,
 		bitCount
 	)
 end
@@ -196,31 +191,31 @@ end
 function BitPacket.Optional<T>(
 	item: Deserializable<T> | BitPacket<T>
 ): BitPacket<T?>
-	return BitPacket.new(function(bb: BitBuffer.BitBuffer, value)
+	return BitPacket.new(function(bb: BitBuffer, value)
 		local has = value ~= nil
 		bb:WriteBool(has)
 		if has then writeObject(bb, item, value) end
-	end, function(bb: BitBuffer.BitBuffer)
+	end, function(bb: BitBuffer)
 		if bb:ReadBool() then return readObject(bb, item) end
 		return nil
-	end, item.size)
+	end, item.Size)
 end
 
 function BitPacket.FixedArray<T>(
 	item: BitPacket<T> | Deserializable<T>,
 	size: number
 ): BitPacket<{ T }>
-	return BitPacket.new(function(bb: BitBuffer.BitBuffer, value)
+	return BitPacket.new(function(bb: BitBuffer, value)
 		for i = 1, size do
 			writeObject(bb, item, value[i])
 		end
-	end, function(bb: BitBuffer.BitBuffer)
+	end, function(bb: BitBuffer)
 		local t = {}
 		for i = 1, size do
 			t[i] = readObject(bb, item)
 		end
 		return t
-	end, item.size and item.size * size)
+	end, item.Size and item.Size * size)
 end
 
 function BitPacket.Array<T>(
@@ -228,14 +223,14 @@ function BitPacket.Array<T>(
 	bitCount: number?
 ): BitPacket<{ T }>
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value)
+		function(bb: BitBuffer, value)
 			bb:WriteUint(#value, bitCount)
 			BitPacket.FixedArray(item, #value):Write(bb, value)
 		end,
-		function(bb: BitBuffer.BitBuffer)
+		function(bb: BitBuffer)
 			return BitPacket.FixedArray(item, bb:ReadUint(bitCount)):Read(bb)
 		end,
-		item.size
+		item.Size
 	)
 end
 
@@ -243,10 +238,10 @@ function BitPacket.InfiniteArray<T>(
 	item: BitPacket<T> | Deserializable<T>
 ): BitPacket<{ T }>
 	return BitPacket.new(
-		function(bb: BitBuffer.BitBuffer, value)
+		function(bb: BitBuffer, value)
 			BitPacket.FixedArray(item, #value):Write(bb, value)
 		end,
-		function(bb: BitBuffer.BitBuffer)
+		function(bb: BitBuffer)
 			local t = {}
 			while true do
 				local success, value = pcall(readObject, bb, item)
@@ -256,7 +251,7 @@ function BitPacket.InfiniteArray<T>(
 			end
 			return t
 		end,
-		item.size
+		item.Size
 	)
 end
 
