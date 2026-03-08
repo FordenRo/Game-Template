@@ -31,11 +31,11 @@ export type SettingConfig<T> = {
 }
 
 export type PlayerSettings = {
-	asTable: (self: Self) -> SettingsTable,
 	Serialize: (self: Self) -> BitBuffer.BitBuffer,
+	asTable: (self: Self) -> SettingsTable,
 } & SettingsTable & Class.Class
 
-type Self = {} & PlayerSettings
+type Self = PlayerSettings
 
 function PlayerSettings.new(): PlayerSettings
 	local self: Self = Class(PlayerSettings)

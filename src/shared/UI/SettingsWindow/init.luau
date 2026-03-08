@@ -94,13 +94,15 @@ local function initSettings(self: Self)
 				and self.tabContents[v.Parent]
 			or initGroup(self, v.Parent)
 
-		setting.Value = SettingsService.LocalSettings[k]
+		setting.Value = SettingsService.Settings[k]
 		self.settings[v] = setting
 
 		self.trove:Add(
-			setting:GetPropertyChangedSignal("Value"):Connect(
-				function() SettingsService.LocalSettings[k] = setting.Value end
-			)
+			setting
+				:GetPropertyChangedSignal("Value")
+				:Connect(
+					function() SettingsService.Settings[k] = setting.Value end
+				)
 		)
 	end
 end
