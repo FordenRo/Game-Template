@@ -15,6 +15,8 @@ export type BaseAction = {
 			ReleasedThreshold: number,
 		}
 	},
+	Index: number,
+	Description: string,
 }
 export type BoolAction = getreturns<typeof(Types.BoolAction)>
 export type MouseAction = getreturns<typeof(Types.MouseAction)>
@@ -25,6 +27,8 @@ export type Context = {
 	Id: number,
 	Title: string,
 	Actions: { [string]: BaseAction },
+	Index: number,
+	Description: string,
 }
 
 function Types.BoolAction(
@@ -37,13 +41,17 @@ function Types.BoolAction(
 			PressedThreshold: number,
 			ReleasedThreshold: number,
 		}
-	}
+	},
+	index: number?,
+	description: string?
 )
 	return {
 		Type = Enum.InputActionType.Bool,
 		Id = id,
 		Title = title,
 		Bindings = bindings,
+		Index = index or 0,
+		Description = description or "",
 	}
 end
 
@@ -54,13 +62,17 @@ function Types.MouseAction(
 		{
 			KeyCode: "MousePosition" | "Touch",
 		}
-	}
+	},
+	index: number?,
+	description: string?
 )
 	return {
 		Type = Enum.InputActionType.ViewportPosition,
 		Id = id,
 		Title = title,
 		Bindings = bindings,
+		Index = index or 0,
+		Description = description or "",
 	}
 end
 
@@ -73,13 +85,17 @@ function Types.Action1D(
 			Down: KeyCodes,
 			KeyCode: KeyCodes,
 		}
-	}
+	},
+	index: number?,
+	description: string?
 )
 	return {
 		Type = Enum.InputActionType.Direction1D,
 		Id = id,
 		Title = title,
 		Bindings = bindings,
+		Index = index or 0,
+		Description = description or "",
 	}
 end
 
@@ -94,13 +110,17 @@ function Types.Action2D(
 			Right: KeyCodes,
 			KeyCode: "Thumbstick1" | "Thumbstick2",
 		}
-	}
+	},
+	index: number?,
+	description: string?
 )
 	return {
 		Type = Enum.InputActionType.Direction2D,
 		Id = id,
 		Title = title,
 		Bindings = bindings,
+		Index = index or 0,
+		Description = description or "",
 	}
 end
 
@@ -116,21 +136,33 @@ function Types.Action3D(
 			Forward: KeyCodes,
 			Backward: KeyCodes,
 		}
-	}
+	},
+	index: number?,
+	description: string?
 )
 	return {
 		Type = Enum.InputActionType.Direction3D,
 		Id = id,
 		Title = title,
 		Bindings = bindings,
+		Index = index or 0,
+		Description = description or "",
 	}
 end
 
-function Types.Context<V>(id: number, title: string, actions: V)
+function Types.Context<V>(
+	id: number,
+	title: string,
+	actions: V,
+	index: number?,
+	description: string?
+)
 	return {
 		Id = id,
 		Title = title,
 		Actions = actions,
+		Index = index or 0,
+		Description = description or "",
 	}
 end
 
