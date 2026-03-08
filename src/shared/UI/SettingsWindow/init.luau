@@ -23,10 +23,7 @@ for _, v in script.Types:GetChildren() do
 	if v:IsA("ModuleScript") then Types[v.Name] = require(v) end
 end
 
-local INPUTS_TAB = {
-	Title = "Input",
-	Index = -1,
-}
+local INPUTS_TAB = SettingTypes.Tab("Input", -1)
 
 local SettingsWindow = { change = {} }
 SettingsWindow.extends = Component
@@ -126,10 +123,14 @@ end
 
 local function initInputs(self: Self)
 	local content = createTabContent()
+	self:AddTab(INPUTS_TAB, content)
+
 	for ck, cv in InputsConfig :: { [string]: InputTypes.Context } do
 		local context = InputService[ck]
 		initGroup(self, {
 			Title = ck,
+			Description = cv.Description,
+			Index = cv.Index,
 			Parent = INPUTS_TAB,
 		})
 		for ak, av in cv.Actions do
@@ -140,7 +141,6 @@ local function initInputs(self: Self)
 			end
 		end
 	end
-	self:AddTab(INPUTS_TAB, content)
 end
 
 function SettingsWindow.new(): SettingsWindow
@@ -153,6 +153,7 @@ function SettingsWindow.new(): SettingsWindow
 
 	initTabs(self)
 	initSettings(self)
+	initInputs(self)
 
 	self.trove:Add(
 		self.Instance.Sidebar.Control.Close.Activated:Connect(
