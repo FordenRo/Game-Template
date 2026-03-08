@@ -65,6 +65,7 @@ type InputConfig = {
 
 export type InputService = {
 	GetStringForAction: (self: InputService, action: InputAction) -> string,
+	GetStringForBinding: (self: InputService, binding: InputBinding) -> string,
 } & InputsTable & Class.Class
 
 type Self = Replicated.Replicated & InputService
@@ -123,7 +124,7 @@ function initClient(self: Self)
 	end)
 end
 
-do -- GetStringForAction method
+do -- GetStringForAction, GetStringForBinding methods
 	local ACTION_TYPE_MAP = {
 		[Enum.InputActionType.Bool] = { "KeyCode" },
 		[Enum.InputActionType.Direction1D] = { "Up", "Down" },
@@ -137,6 +138,7 @@ do -- GetStringForAction method
 			"Right",
 		},
 	}
+
 	function InputService.GetStringForAction(self: Self, action: InputAction)
 		local binds = {}
 		for _, binding in action:GetChildren() do
@@ -152,6 +154,18 @@ do -- GetStringForAction method
 			table.insert(binds, table.concat(keyCodes, "/"))
 		end
 		return table.concat(binds, ", ")
+	end
+
+	function InputService.GetStringForBinding(self: Self, binding: InputBinding)
+		local action: InputAction = binding.Parent
+		local keyCodes = {}
+		for _, k in ACTION_TYPE_MAP[action.Type] do
+			table.insert(
+				keyCodes,
+				UserInputService:GetStringForKeyCode(binding[k])
+			)
+		end
+		return table.concat(keyCodes, "/")
 	end
 end
 
