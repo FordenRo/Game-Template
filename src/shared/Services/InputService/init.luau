@@ -9,6 +9,7 @@ local BitPacket = require("../Packages/BitPacket")
 local Class = require("../Packages/Class")
 local InputsConfig = require("../InputsConfig")
 local Replicated = require("../Packages/Replicated")
+local TryCall = require("../Packages/TryCall")
 
 local InputService = {}
 InputService.extends = Class
@@ -158,11 +159,28 @@ end
 
 function InputService.onServerReceived(self: Self, player: Player, b: buffer)
 	local datastore = DataStoreService:GetDataStore("Inputs")
-	datastore:SetAsync(tostring(player.UserId), b)
+	TryCall(
+		function() datastore:SetAsync(tostring(player.UserId), b) end,
+		nil,
+		warn,
+		3,
+		1000
+	)
 end
 
 function InputService.onServerInvoked(self: Self, player: Player)
 	local datastore = DataStoreService:GetDataStore("Inputs")
+	local out
+	TryCall(
+		function() return datastore:GetAsync(tostring(player.UserId)) end,
+		function(data)
+			if data then out = data end
+		end,
+		warn,
+		3,
+		300
+	)
+	return out
 end
 
 --#endregion
