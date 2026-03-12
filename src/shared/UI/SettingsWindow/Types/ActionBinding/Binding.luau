@@ -8,33 +8,28 @@ local Trove = require("../../../../Packages/Trove")
 local Binding = {}
 Binding.extends = Component
 
-export type Binding = setmetatable<{
+export type Binding = {
 	Type: Enum.InputActionType,
-	InputBinding: { Parent: InputAction } & InputBinding,
-}, { __index: Component.Component<{
+	InputBinding: InputBinding,
+} & Component.Component<{
 	More: ImageButton,
-} & TextButton> }>
+} & TextButton>
 
-type BoolBinding = setmetatable<
-	index<index<InputTypes.BoolAction, "Bindings">, number>,
-	{ __index: Binding }
->
-type MouseBinding = setmetatable<
-	index<index<InputTypes.MouseAction, "Bindings">, number>,
-	{ __index: Binding }
->
-type Action1DBinding = setmetatable<
-	index<index<InputTypes.Action1D, "Bindings">, number>,
-	{ __index: Binding }
->
-type Action2DBinding = setmetatable<
-	index<index<InputTypes.Action2D, "Bindings">, number>,
-	{ __index: Binding }
->
-type Action3DBinding = setmetatable<
-	index<index<InputTypes.Action3D, "Bindings">, number>,
-	{ __index: Binding }
->
+type BoolBinding =
+	index<index<InputTypes.BoolAction, "Bindings">, number>
+	& Binding
+type MouseBinding =
+	index<index<InputTypes.MouseAction, "Bindings">, number>
+	& Binding
+type Action1DBinding =
+	index<index<InputTypes.Action1D, "Bindings">, number>
+	& Binding
+type Action2DBinding =
+	index<index<InputTypes.Action2D, "Bindings">, number>
+	& Binding
+type Action3DBinding =
+	index<index<InputTypes.Action3D, "Bindings">, number>
+	& Binding
 
 type Self = Binding
 

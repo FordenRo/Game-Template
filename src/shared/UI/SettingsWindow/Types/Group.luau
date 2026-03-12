@@ -10,7 +10,9 @@ Group.extends = Component
 
 export type Group = {
 	Expanded: boolean,
-} & Component.Component<{
+} & Component.Component<GroupInstance>
+
+type GroupInstance = {
 	UIPadding: UIPadding,
 	UIStroke: UIStroke,
 	Content: { UIListLayout: UIListLayout } & Frame,
@@ -21,7 +23,7 @@ export type Group = {
 		} & Frame,
 		Arrow: ImageLabel,
 	} & ImageButton,
-} & ImageButton>
+} & ImageButton
 
 type Self = {
 	size: number,

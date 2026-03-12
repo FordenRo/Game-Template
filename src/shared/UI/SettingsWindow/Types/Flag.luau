@@ -10,13 +10,15 @@ Flag.extends = Component
 
 export type Flag = {
 	Value: boolean,
-} & Component.Component<{
+} & Component.Component<FlagInstance>
+
+type FlagInstance = {
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
 	} & Frame,
 	CheckBox: { Check: ImageLabel } & ImageButton,
-} & Frame>
+} & Frame
 
 type Self = Flag
 

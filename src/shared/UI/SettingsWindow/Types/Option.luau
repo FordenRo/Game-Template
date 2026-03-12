@@ -13,7 +13,9 @@ Option.extends = Component
 export type Option = {
 	Value: number,
 	Expanded: boolean,
-} & Component.Component<{
+} & Component.Component<OptionInstance>
+
+type OptionInstance = {
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
@@ -22,7 +24,7 @@ export type Option = {
 		Title: TextLabel,
 		ArrowHolder: { Arrow: ImageLabel } & Frame,
 	} & ImageButton,
-} & ImageButton>
+} & ImageButton
 
 type Self = {
 	trove: Trove.Trove,
