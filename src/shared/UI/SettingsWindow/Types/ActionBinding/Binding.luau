@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Component = require("../../../../Packages/Component")
 local InputService = require("../../../../Services/InputService")
@@ -42,9 +43,36 @@ function Binding.new(inputBinding: InputBinding): Binding
 
 	local trove = Trove.new()
 	trove:Add(
-		self.InputBinding
-			:GetPropertyChangedSignal("KeyCode")
-			:Connect(function() end)
+		self.InputBinding.Changed:Connect(
+			function()
+				self.Instance.Text =
+					InputService:GetStringForBinding(self.InputBinding)
+			end
+		),
+		self.Instance.Activated:Connect(function()
+			InputService.Enabled = false
+			self.Instance.Text = "..."
+
+			local subTrove = trove:Extend()
+			subTrove:AddAll(
+				UserInputService.InputBegan:Connect(function(input)
+					if not input.KeyCode then return end
+
+					if input.KeyCode == Enum.KeyCode.Escape then
+						subTrove:Destroy()
+						return
+					end
+
+					self.InputBinding.KeyCode = input.KeyCode
+					subTrove:Destroy()
+				end),
+				function()
+					self.Instance.Text =
+						InputService:GetStringForBinding(self.InputBinding)
+					InputService.Enabled = true
+				end
+			)
+		end)
 	)
 
 	trove:AttachToInstance(self.Instance)
