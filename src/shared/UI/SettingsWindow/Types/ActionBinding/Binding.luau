@@ -38,8 +38,7 @@ function Binding.new(inputBinding: InputBinding): Binding
 		Component(ReplicatedStorage.UI.Settings.Types.Binding:Clone(), Binding)
 
 	self.InputBinding = inputBinding
-	self.Instance.Text =
-		InputService:GetStringForAction(self.InputBinding.Parent)
+	self.Instance.Text = InputService:GetStringForBinding(self.InputBinding)
 
 	local trove = Trove.new()
 	trove:Add(
