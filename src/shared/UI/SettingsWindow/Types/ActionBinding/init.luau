@@ -48,6 +48,13 @@ function ActionBinding.new(
 		self.Instance.Control.Add.Activated:Connect(function() end)
 	)
 
+	for _, v in inputAction:GetChildren() do
+		if not v:IsA("InputBinding") then continue end
+
+		local binding = Binding.new(v)
+		binding.Instance.Parent = self.Instance.Control
+	end
+
 	trove:AttachToInstance(self.Instance)
 	return self
 end
