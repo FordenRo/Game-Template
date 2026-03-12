@@ -11,7 +11,7 @@ local InputsConfig = require("../InputsConfig")
 local Replicated = require("../Packages/Replicated")
 local TryCall = require("../Packages/TryCall")
 
-local InputService = {}
+local InputService = { change = {} }
 InputService.extends = Class
 InputService.implements = { Replicated }
 
@@ -64,11 +64,15 @@ type InputConfig = {
 }
 
 export type InputService = {
+	Enabled: boolean,
+
 	GetStringForAction: (self: InputService, action: InputAction) -> string,
 	GetStringForBinding: (self: InputService, binding: InputBinding) -> string,
 } & InputsTable & Class.Class
 
-type Self = Replicated.Replicated & InputService
+type Self = {
+	lastEnabled: { [InputContext]: boolean },
+} & Replicated.Replicated & InputService
 
 --#endregion
 
@@ -91,6 +95,8 @@ local function getInputs(self: Self)
 end
 
 function initClient(self: Self)
+	self:RawSet("Enabled", true)
+
 	local inputs = getInputs(self)
 	for ck, cv in InputsConfig :: { [string]: InputConfig } do
 		local context = Instance.new("InputContext")
@@ -122,6 +128,25 @@ function initClient(self: Self)
 
 		self:SendServer(Packet:Serialize(self):toBase64())
 	end)
+end
+
+function InputService.change.Enabled(self: Self)
+	if self.Enabled then
+		for k, v in self.lastEnabled do
+			k.Enabled = v
+		end
+		self.lastEnabled = nil
+	else
+		self.lastEnabled = {}
+		for k, v: InputContext in self do
+			if typeof(v) ~= "Instance" or not v:IsA("InputContext") then
+				continue
+			end
+
+			self.lastEnabled[v] = v.Enabled
+			v.Enabled = false
+		end
+	end
 end
 
 do -- GetStringForAction, GetStringForBinding methods
