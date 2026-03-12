@@ -1,4 +1,5 @@
 --!native
+local Signal = require("./Signal")
 
 -- Preload globals
 local table = table
@@ -11,6 +12,31 @@ export type Set<V> = typeof(setmetatable(
 	{} :: {
 		--- Whether the set has no items.
 		IsEmpty: boolean,
+
+		--[[
+			Fired immediately after an item is added to the set.
+
+			```luau
+			local set = Set()
+			set.ItemAdded:Connect(function(value)
+				print(`Fired {value}`)
+			end)
+			set:Add("test") -- Fired "test"
+			```
+		]]
+		ItemAdded: Signal.Signal<V>,
+		--[[
+			Fired immediately after an item is removed from the array.
+
+			```luau
+			local set = Set("test")
+			set.ItemAdded:Connect(function(value)
+				print(`Fired {value}`)
+			end)
+			set:Remove("test") -- Fired "test"
+			```
+		]]
+		ItemRemoved: Signal.Signal<V>,
 
 		--- Adds a `value` to the set.
 		Add: (self: Set<V>, value: V) -> (),
@@ -52,7 +78,11 @@ type Self = setmetatable<{
 function Meta.__call<V>(_, ...: V): Set<V> return Set.fromArray({ ... }) end
 
 function Set.fromTable<V>(t: { [V]: true }): Set<V>
-	local self: Self = setmetatable({ __table = t }, Set)
+	local self: Self = setmetatable({
+		__table = t,
+		ItemAdded = Signal.new(),
+		ItemRemoved = Signal.new(),
+	}, Set)
 
 	table.freeze(self)
 	return self
@@ -76,7 +106,12 @@ function Set.get.IsEmpty(self: Self) return next(self.__table) == nil end
 
 --#region Methods
 
-function Set.Add(self: Self, value: any) self.__table[value] = true end
+function Set.Add(self: Self, value: any)
+	if self:Contains(value) then return end
+
+	self.__table[value] = true
+	self.ItemAdded:Fire(value)
+end
 
 function Set.Merge(self: Self, value: any)
 	for v, _ in value do
@@ -84,7 +119,12 @@ function Set.Merge(self: Self, value: any)
 	end
 end
 
-function Set.Remove(self: Self, value: any) self.__table[value] = nil end
+function Set.Remove(self: Self, value: any)
+	if not self:Contains(value) then return end
+
+	self.__table[value] = nil
+	self.ItemRemoved:Fire(value)
+end
 
 function Set.Contains(self: Self, value: any) return self.__table[value] ~= nil end
 
