@@ -127,7 +127,7 @@ local function initInputs(self: Self)
 
 	for ck, cv in InputsConfig :: { [string]: InputTypes.Context } do
 		local context = InputService[ck]
-		initGroup(self, {
+		local groupContent = initGroup(self, {
 			Title = ck,
 			Description = cv.Description,
 			Index = cv.Index,
@@ -136,9 +136,7 @@ local function initInputs(self: Self)
 		for ak, av in cv.Actions do
 			local action = context[ak]
 			local binding = ActionBinding.new(action, av)
-			binding.Instance.Parent = content
-			for bk, bv in av.Bindings do
-			end
+			binding.Instance.Parent = groupContent
 		end
 	end
 end
