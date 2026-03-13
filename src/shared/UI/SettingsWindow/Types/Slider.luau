@@ -9,7 +9,9 @@ Slider.extends = Component
 
 export type Slider = {
 	Value: number,
-} & Component.Component<{
+} & Component.Component<SliderInstance>
+
+type SliderInstance = {
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
@@ -24,7 +26,7 @@ export type Slider = {
 		Reset: ImageButton,
 		Value: TextBox,
 	} & Frame,
-} & Frame>
+} & Frame
 
 type Self = {
 	config: SettingTypes.Slider,

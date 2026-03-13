@@ -1,19 +1,29 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
+local ActionBinding = require("@self/Types/ActionBinding")
 local Array = require("../Packages/Array")
 local Component = require("../Packages/Component")
 local Group = require("@self/Types/Group")
+local InputTypes = require("../Services/InputService/InputTypes")
+local InputsConfig = require("../InputsConfig")
 local SettingTypes = require("../Services/SettingsService/SettingTypes")
 local SettingsConfig = require("../SettingsConfig")
 local SettingsService = require("../Services/SettingsService")
 local TabButton = require("@self/TabButton")
 local Trove = require("../Packages/Trove")
 
+local InputService
+if script.Parent.Parent.Services:FindFirstChild("InputService") then
+	InputService = require("../Services/InputService")
+end
+
 local Types = {}
 for _, v in script.Types:GetChildren() do
 	if v:IsA("ModuleScript") then Types[v.Name] = require(v) end
 end
+
+local INPUTS_TAB = SettingTypes.Tab("Input", -1)
 
 local SettingsWindow = { change = {} }
 SettingsWindow.extends = Component
@@ -48,6 +58,21 @@ type Self = {
 	groups: { [SettingTypes.Group]: Group.Group },
 } & SettingsWindow
 
+local function createTabContent()
+	local content = Instance.new("Frame")
+	content.Size = UDim2.fromScale(1, 0)
+	content.AutomaticSize = Enum.AutomaticSize.Y
+	content.BackgroundTransparency = 1
+	content.Visible = false
+
+	local listLayout = Instance.new("UIListLayout")
+	listLayout.Padding = UDim.new(0, 10)
+	listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	listLayout.Parent = content
+
+	return content
+end
+
 local function initTabs(self: Self)
 	self.tabContents = {}
 	self.tabButtons = {}
@@ -56,18 +81,7 @@ local function initTabs(self: Self)
 		:Unified()
 		:Filtered(function(v) return v.Type == "Tab" end)
 	for _, tab in tabs do
-		local content = Instance.new("Frame")
-		content.Size = UDim2.fromScale(1, 0)
-		content.AutomaticSize = Enum.AutomaticSize.Y
-		content.BackgroundTransparency = 1
-		content.Visible = false
-
-		local listLayout = Instance.new("UIListLayout")
-		listLayout.Padding = UDim.new(0, 10)
-		listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		listLayout.Parent = content
-
-		self:AddTab(tab, content)
+		self:AddTab(tab, createTabContent())
 	end
 	task.defer(function() self.CurrentTab = tabs[1] end)
 end
@@ -107,6 +121,26 @@ local function initSettings(self: Self)
 	end
 end
 
+local function initInputs(self: Self)
+	local content = createTabContent()
+	self:AddTab(INPUTS_TAB, content)
+
+	for ck, cv in InputsConfig :: { [string]: InputTypes.Context } do
+		local context = InputService[ck]
+		local groupContent = initGroup(self, {
+			Title = ck,
+			Description = cv.Description,
+			Index = cv.Index,
+			Parent = INPUTS_TAB,
+		})
+		for ak, av in cv.Actions do
+			local action = context[ak]
+			local binding = ActionBinding.new(action, av)
+			binding.Instance.Parent = groupContent
+		end
+	end
+end
+
 function SettingsWindow.new(): SettingsWindow
 	local self: Self = Component(
 		ReplicatedStorage.UI.Settings.SettingsWindow:Clone(),
@@ -117,6 +151,7 @@ function SettingsWindow.new(): SettingsWindow
 
 	initTabs(self)
 	initSettings(self)
+	initInputs(self)
 
 	self.trove:Add(
 		self.Instance.Sidebar.Control.Close.Activated:Connect(

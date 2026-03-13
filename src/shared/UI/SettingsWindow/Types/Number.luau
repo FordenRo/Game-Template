@@ -9,7 +9,9 @@ Number.extends = Component
 
 export type Number = {
 	Value: number,
-} & Component.Component<{
+} & Component.Component<NumberOption>
+
+type NumberOption = {
 	Content: {
 		Title: TextLabel,
 		Description: TextLabel,
@@ -18,7 +20,7 @@ export type Number = {
 		Reset: ImageButton,
 		Value: TextBox,
 	} & Frame,
-} & Frame>
+} & Frame
 
 type Self = {
 	config: SettingTypes.Slider,
