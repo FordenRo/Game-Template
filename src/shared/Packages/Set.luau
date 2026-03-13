@@ -160,13 +160,13 @@ function Set.__add<V, A>(self: Set<V>, obj: A): Set<V | A>
 	return Set.fromTable(t)
 end
 
-function Set.__len(self: Self) return #self:toList() end
+function Set.__len(self: Self) return #self:toArray() end
 
-function Set.__iter(self: Self) return next, self:toList() end
+function Set.__iter(self: Self) return next, self:toArray() end
 
 function Set.__tostring(self: Self)
 	return `Set({table.concat(
-		self:Mapped(function(v) return tostring(v) end):toList(),
+		self:Mapped(function(v) return tostring(v) end):toArray(),
 		", "
 	)})`
 end
