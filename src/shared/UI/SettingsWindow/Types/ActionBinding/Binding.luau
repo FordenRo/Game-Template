@@ -1,13 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local Class = require("../../../../Packages/Class")
 local Component = require("../../../../Packages/Component")
 local InputService = require("../../../../Services/InputService")
 local InputTypes = require("../../../../Services/InputService/InputTypes")
 local Trove = require("../../../../Packages/Trove")
 
 local Binding = {}
-Binding.extends = Component
+Class(Binding, Component)
 
 export type Binding = {
 	Type: Enum.InputActionType,
@@ -34,9 +35,8 @@ type Action3DBinding =
 
 type Self = Binding
 
-function Binding.new(inputBinding: InputBinding): Binding
-	local self: Self =
-		Component(ReplicatedStorage.UI.Settings.Types.Binding:Clone(), Binding)
+function Binding.init(self: Self, inputBinding: InputBinding)
+	self:Super():init(ReplicatedStorage.UI.Settings.Types.Binding:Clone())
 
 	self.InputBinding = inputBinding
 	self.Instance.Text = InputService:GetStringForBinding(self.InputBinding)
@@ -76,9 +76,8 @@ function Binding.new(inputBinding: InputBinding): Binding
 	)
 
 	trove:AttachToInstance(self.Instance)
-	return self
 end
 
 return table.freeze(Binding) :: {
-	new: typeof(Binding.new),
+	new: (inputBinding: InputBinding) -> Binding,
 }

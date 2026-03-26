@@ -1,11 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Class = require("../../../Packages/Class")
 local Component = require("../../../Packages/Component")
 local SettingTypes = require("../../../Services/SettingsService/SettingTypes")
 local Trove = require("../../../Packages/Trove")
 
-local Slider = { set = {} }
-Slider.extends = Component
+local Slider = {}
+Class(Slider, Component)
 
 export type Slider = {
 	Value: number,
@@ -51,9 +52,8 @@ local function setDragValue(self: Self, x: number)
 	self.drag.DragUDim2 = UDim2.fromScale(toRelative(self, x) - 0.5, 0)
 end
 
-function Slider.new(config: SettingTypes.Slider): Slider
-	local self: Self =
-		Component(ReplicatedStorage.UI.Settings.Types.Slider:Clone(), Slider)
+function Slider.init(self: Self, config: SettingTypes.Slider)
+	self:Super():init(ReplicatedStorage.UI.Settings.Types.Slider:Clone())
 
 	self.config = config
 	self.drag = self.Instance.Control.Slider.Handle.UIDragDetector
@@ -94,7 +94,6 @@ function Slider.new(config: SettingTypes.Slider): Slider
 	self.Value = config.Default
 
 	trove:AttachToInstance(self.Instance)
-	return self
 end
 
 local function mapped(self: Self, x: number)
@@ -117,5 +116,5 @@ function Slider.set.Value(self: Self, value: number)
 end
 
 return table.freeze(Slider) :: {
-	new: typeof(Slider.new),
+	new: (config: SettingTypes.Slider) -> Slider,
 }

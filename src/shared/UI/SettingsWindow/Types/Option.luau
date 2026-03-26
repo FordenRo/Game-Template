@@ -3,12 +3,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
+local Class = require("../../../Packages/Class")
 local Component = require("../../../Packages/Component")
 local SettingTypes = require("../../../Services/SettingsService/SettingTypes")
 local Trove = require("../../../Packages/Trove")
 
-local Option = { change = {} }
-Option.extends = Component
+local Option = {}
+Class(Option, Component)
 
 export type Option = {
 	Value: number,
@@ -89,9 +90,8 @@ local function initButtons(self: Self)
 	button:Destroy()
 end
 
-function Option.new(config: SettingTypes.Option): Option
-	local self: Self =
-		Component(ReplicatedStorage.UI.Settings.Types.Option:Clone(), Option)
+function Option.init(self: Self, config: SettingTypes.Option)
+	self:Super():init(ReplicatedStorage.UI.Settings.Types.Option:Clone())
 
 	self.Instance.Content.Title.Text = config.Title
 	self.Instance.Content.Description.Text = config.Description
@@ -121,7 +121,6 @@ function Option.new(config: SettingTypes.Option): Option
 	self.Value = config.Default
 
 	self.trove:AttachToInstance(self.Instance)
-	return self
 end
 
 function Option.change.Value(self: Self)
@@ -146,5 +145,5 @@ function Option.change.Expanded(self: Self)
 end
 
 return table.freeze(Option) :: {
-	new: typeof(Option.new),
+	new: (config: SettingTypes.Option) -> Option,
 }

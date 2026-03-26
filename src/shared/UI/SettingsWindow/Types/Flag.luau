@@ -1,12 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
+local Class = require("../../../Packages/Class")
 local Component = require("../../../Packages/Component")
 local SettingTypes = require("../../../Services/SettingsService/SettingTypes")
 local Trove = require("../../../Packages/Trove")
 
-local Flag = { change = {} }
-Flag.extends = Component
+local Flag = {}
+Class(Flag, Component)
 
 export type Flag = {
 	Value: boolean,
@@ -22,9 +23,8 @@ type FlagInstance = {
 
 type Self = Flag
 
-function Flag.new(config: SettingTypes.Flag): Flag
-	local self: Self =
-		Component(ReplicatedStorage.UI.Settings.Types.Flag:Clone(), Flag)
+function Flag.init(self: Self, config: SettingTypes.Flag)
+	self:Super():init(ReplicatedStorage.UI.Settings.Types.Flag:Clone())
 
 	self.Instance.Content.Title.Text = config.Title
 	self.Instance.Content.Description.Text = config.Description
@@ -40,7 +40,6 @@ function Flag.new(config: SettingTypes.Flag): Flag
 	self.Value = config.Default
 
 	trove:AttachToInstance(self.Instance)
-	return self
 end
 
 function Flag.change.Value(self: Self)
@@ -50,5 +49,5 @@ function Flag.change.Value(self: Self)
 end
 
 return table.freeze(Flag) :: {
-	new: typeof(Flag.new),
+	new: (config: SettingTypes.Flag) -> Flag,
 }

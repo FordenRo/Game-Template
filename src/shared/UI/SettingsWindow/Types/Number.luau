@@ -1,11 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Class = require("../../../Packages/Class")
 local Component = require("../../../Packages/Component")
 local SettingTypes = require("../../../Services/SettingsService/SettingTypes")
 local Trove = require("../../../Packages/Trove")
 
-local Number = { set = {} }
-Number.extends = Component
+local Number = {}
+Class(Number, Component)
 
 export type Number = {
 	Value: number,
@@ -33,9 +34,8 @@ local function setBoxValue(self: Self, x: number)
 	self.box.Text = string.format(`%.{l}f`, x)
 end
 
-function Number.new(config: SettingTypes.Slider): Number
-	local self: Self =
-		Component(ReplicatedStorage.UI.Settings.Types.Number:Clone(), Number)
+function Number.init(self: Self, config: SettingTypes.Slider)
+	self:Super():init(ReplicatedStorage.UI.Settings.Types.Number:Clone())
 
 	self.config = config
 	self.box = self.Instance.Control.Value
@@ -64,7 +64,6 @@ function Number.new(config: SettingTypes.Slider): Number
 	self.Value = config.Default
 
 	trove:AttachToInstance(self.Instance)
-	return self
 end
 
 local function mapped(self: Self, x: number)
@@ -86,5 +85,5 @@ function Number.set.Value(self: Self, value: number)
 end
 
 return table.freeze(Number) :: {
-	new: typeof(Number.new),
+	new: (config: SettingTypes.Slider) -> Number,
 }
