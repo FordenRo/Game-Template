@@ -13,7 +13,7 @@ type function SettingsReturnType(config: type)
 end
 
 local PlayerSettings = {}
-PlayerSettings.extends = Class
+Class(PlayerSettings)
 
 export type SettingsTable = SettingsReturnType<typeof(SettingsConfig)>
 
@@ -37,14 +37,10 @@ export type PlayerSettings = {
 
 type Self = PlayerSettings
 
-function PlayerSettings.new(): PlayerSettings
-	local self: Self = Class(PlayerSettings)
-
+function PlayerSettings.init(self: Self)
 	for k, v in SettingsConfig do
 		self[k] = v.Default
 	end
-
-	return self
 end
 
 function PlayerSettings.asTable(self: Self) return self.__table end
@@ -136,6 +132,6 @@ do
 end
 
 return table.freeze(PlayerSettings) :: {
-	new: typeof(PlayerSettings.new),
+	new: () -> PlayerSettings,
 	deserialize: typeof(PlayerSettings.deserialize),
 }
