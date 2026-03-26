@@ -9,8 +9,8 @@ local buffer = buffer
 local bit32 = bit32
 local string = string
 
-local BitBuffer = { change = {} }
-BitBuffer.extends = Class
+local BitBuffer = {}
+Class(BitBuffer)
 
 --#region Symbols sheets
 BitBuffer.Sym = {}
@@ -210,14 +210,10 @@ type Self = BitBuffer
 
 --#region Constructor methods
 
-function BitBuffer.new(byteCount: number?): BitBuffer
-	local self: Self = Class(BitBuffer)
-
+function BitBuffer.init(self: Self, byteCount: number?)
 	self.RawBuffer = buffer.create(byteCount or 1024)
 	self.Cursor = 0
 	self.Size = 0
-
-	return self
 end
 
 function BitBuffer.fromRawBuffer(b: buffer): BitBuffer
@@ -617,7 +613,7 @@ end
 
 return table.freeze(BitBuffer) :: {
 	--- Creates a clean BitBuffer with internal buffer size of `bytesCount` bytes.
-	new: typeof(BitBuffer.new),
+	new: (byteCount: number?) -> BitBuffer,
 
 	--[[
 		Creates BitBuffer from raw buffer.
