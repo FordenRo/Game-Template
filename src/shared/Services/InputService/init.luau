@@ -11,9 +11,8 @@ local InputsConfig = require("../InputsConfig")
 local Replicated = require("../Packages/Replicated")
 local TryCall = require("../Packages/TryCall")
 
-local InputService = { change = {} }
-InputService.extends = Class
-InputService.implements = { Replicated }
+local InputService = {}
+Class(InputService, Class, { Replicated })
 
 local Packet
 
@@ -76,13 +75,9 @@ type Self = {
 
 --#endregion
 
-function InputService.new(): InputService
-	local self: Self = Class(InputService)
-
+function InputService.init(self: Self)
 	self:CreateRemotes(script)
 	if RunService:IsClient() then initClient(self) end
-
-	return self
 end
 
 local function getInputs(self: Self)
@@ -327,4 +322,4 @@ do -- Packet
 	)
 end
 
-return InputService.new()
+return InputService.new() :: InputService
