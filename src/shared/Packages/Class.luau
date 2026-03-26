@@ -148,24 +148,26 @@ function Meta.__call(_, base: Base, extends: Base?, implements: { Base }?)
 	if implements then base.implements = implements end
 
 	function base.new(...)
-		local self: Self = setmetatable({
-			__table = {},
-			__base = base,
-			__top = base,
-			__propChangedSignals = {},
-			Changed = Signal.new(),
-		}, ClassMeta)
-
+		local self: Self = Class(base)
 		self:init(...)
-
 		return self
 	end
 
 	return base
 end
 
-function Class.new<S>(source: S?): S & Class
-	return Class({ extends = Class }, source)
+function Class.new(base: Base?): Class
+	base = base or Class
+
+	local self: Self = setmetatable({
+		__table = {},
+		__base = base,
+		__top = base,
+		__propChangedSignals = {},
+		Changed = Signal.new(),
+	}, ClassMeta)
+
+	return self
 end
 
 function Class.isClass(obj: any): boolean
