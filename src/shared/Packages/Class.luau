@@ -213,16 +213,20 @@ function Class.Super(self: Self)
 	}, ClassMeta)
 end
 
-function Class.IsA(self: Self, base: Base?)
+function isA(base: Base?, target: Base)
 	if not base then return false end
-
-	if self:TypeOf(base) then return true end
-	if self.__base.implements then
-		for _, v in self.__base.implements do
-			self:IsA(v)
+	if base == target then return true end
+	if base.implements then
+		for _, v in base.implements do
+			if isA(v, target) then return true end
 		end
 	end
-	return self:IsA(base.extends)
+	return isA(base.extends, target)
+end
+
+function Class.IsA(self: Self, base: Base?)
+	if not base then return false end
+	return isA(self.__base, base)
 end
 
 function Class.TypeOf(self: Self, base: any) return self.__base == base end
