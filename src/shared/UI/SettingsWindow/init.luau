@@ -3,6 +3,7 @@ local TweenService = game:GetService("TweenService")
 
 local ActionBinding = require("@self/Types/ActionBinding")
 local Array = require("../Packages/Array")
+local Class = require("../Packages/Class")
 local Component = require("../Packages/Component")
 local Group = require("@self/Types/Group")
 local InputTypes = require("../Services/InputService/InputTypes")
@@ -25,8 +26,8 @@ end
 
 local INPUTS_TAB = SettingTypes.Tab("Input", -1)
 
-local SettingsWindow = { change = {} }
-SettingsWindow.extends = Component
+local SettingsWindow = {}
+Class(SettingsWindow, Component)
 
 export type SettingsWindow = {
 	CurrentTab: SettingTypes.Tab,
@@ -141,11 +142,8 @@ local function initInputs(self: Self)
 	end
 end
 
-function SettingsWindow.new(): SettingsWindow
-	local self: Self = Component(
-		ReplicatedStorage.UI.Settings.SettingsWindow:Clone(),
-		SettingsWindow
-	)
+function SettingsWindow.init(self: Self)
+	self:Super():init(ReplicatedStorage.UI.Settings.SettingsWindow:Clone())
 
 	self.trove = Trove.new()
 
@@ -160,7 +158,6 @@ function SettingsWindow.new(): SettingsWindow
 	)
 
 	self.trove:AttachToInstance(self.Instance)
-	return self
 end
 
 function SettingsWindow.change.CurrentTab(self: Self)
@@ -236,5 +233,5 @@ end
 function SettingsWindow.Destroy(self: Self) self.Instance:Destroy() end
 
 return table.freeze(SettingsWindow) :: {
-	new: typeof(SettingsWindow.new),
+	new: () -> SettingsWindow,
 }
