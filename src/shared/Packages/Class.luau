@@ -144,7 +144,7 @@ function Meta.__call(_, base: Base, extends: Base?, implements: { Base }?)
 	if not base.change then base.change = {} end
 	if not base.get then base.get = {} end
 	if not base.set then base.set = {} end
-	if extends then base.extends = extends end
+	if not base.extends then base.extends = extends or Class end
 	if implements then base.implements = implements end
 
 	function base.new(...)
