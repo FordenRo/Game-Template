@@ -1,12 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
+local Class = require("../../../Packages/Class")
 local Component = require("../../../Packages/Component")
 local SettingTypes = require("../../../Services/SettingsService/SettingTypes")
 local Trove = require("../../../Packages/Trove")
 
-local Group = { change = {} }
-Group.extends = Component
+local Group = {}
+Class(Group, Component)
 
 export type Group = {
 	Expanded: boolean,
@@ -44,9 +45,8 @@ local function initChild(self: Self, child: Instance)
 	)
 end
 
-function Group.new(config: SettingTypes.Group): Group
-	local self: Self =
-		Component(ReplicatedStorage.UI.Settings.Types.Group:Clone(), Group)
+function Group.init(self: Self, config: SettingTypes.Group)
+	self:Super():init(ReplicatedStorage.UI.Settings.Types.Group:Clone())
 
 	self.Instance.Button.Content.Title.Text = config.Title
 	self.Instance.Button.Content.Description.Text = config.Description
@@ -70,7 +70,6 @@ function Group.new(config: SettingTypes.Group): Group
 	end
 
 	self.trove:AttachToInstance(self.Instance)
-	return self
 end
 
 function Group.change.size(self: Self)
@@ -106,5 +105,5 @@ function Group.change.Expanded(self: Self)
 end
 
 return table.freeze(Group) :: {
-	new: typeof(Group.new),
+	new: (config: SettingTypes.Group) -> Group,
 }

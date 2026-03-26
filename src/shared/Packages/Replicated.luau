@@ -5,7 +5,7 @@ local Class = require("./Class")
 local Signal = require("./Signal")
 
 local Replicated = {}
-Replicated.extends = Class
+Class(Replicated)
 
 export type Replicated = {
 	--- **Server-only** Fired when `SendServer()` is called on the client.
@@ -53,15 +53,6 @@ type Self = {
 	onClientReceived: ((self: Self, ...any) -> ())?,
 } & Replicated
 
-function Replicated.onExtended(self: Self)
-	error("Replicated can only be implemented.")
-end
-
-function Replicated.onImplemented(self: Self)
-	self.ServerReceived = Signal.new()
-	self.ClientReceived = Signal.new()
-end
-
 function Replicated.CreateRemotes(
 	self: Self,
 	obj: Instance | string,
@@ -88,6 +79,8 @@ function Replicated.CreateRemotes(
 end
 
 function initServer(self: Self, parent: Instance, name: string)
+	self.ServerReceived = Signal.new()
+
 	self.RE = Instance.new("RemoteEvent")
 	self.RE.Name = `{name}RE`
 	self.RE.Parent = parent
@@ -113,6 +106,8 @@ function initServer(self: Self, parent: Instance, name: string)
 end
 
 function initClient(self: Self, parent: Instance, name: string)
+	self.ClientReceived = Signal.new()
+
 	self.RE = parent:WaitForChild(`{name}RE`)
 	self.URE = parent:WaitForChild(`{name}URE`)
 	self.RF = parent:WaitForChild(`{name}RF`)

@@ -1,11 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
+local Class = require("../../Packages/Class")
 local Component = require("../../Packages/Component")
 local SettingTypes = require("../../Services/SettingsService/SettingTypes")
 
-local TabButton = { change = {} }
-TabButton.extends = Component
+local TabButton = {}
+Class(TabButton, Component)
 
 export type TabButton = {
 	Selected: boolean,
@@ -16,15 +17,12 @@ export type TabButton = {
 
 type Self = TabButton
 
-function TabButton.new(tab: SettingTypes.Tab): TabButton
-	local self: Self =
-		Component(ReplicatedStorage.UI.Settings.TabButton:Clone(), TabButton)
+function TabButton.init(self: Self, tab: SettingTypes.Tab)
+	self:Super():init(ReplicatedStorage.UI.Settings.TabButton:Clone())
 
 	self.Instance.Text = tab.Title
 	self.Instance.LayoutOrder = tab.Index
 	self.Activated = self.Instance.Activated
-
-	return self
 end
 
 function TabButton.change.Selected(self: Self)
@@ -41,5 +39,5 @@ function TabButton.change.Selected(self: Self)
 end
 
 return table.freeze(TabButton) :: {
-	new: typeof(TabButton.new),
+	new: (tab: SettingTypes.Tab) -> TabButton,
 }

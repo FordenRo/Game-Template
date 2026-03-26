@@ -9,8 +9,7 @@ local Replicated = require("../Packages/Replicated")
 local TryCall = require("../Packages/TryCall")
 
 local SettingsService = {}
-SettingsService.extends = Class
-SettingsService.implements = { Replicated }
+Class(SettingsService, Class, { Replicated })
 
 local settings: { [Player]: PlayerSettings.PlayerSettings } = {}
 
@@ -30,15 +29,11 @@ export type SettingsService = {
 
 type Self = Replicated.Replicated & SettingsService
 
-function SettingsService.new(): SettingsService
-	local self: Self = Class(SettingsService)
-
+function SettingsService.init(self: Self)
 	self.DefaultSettings = PlayerSettings.new()
 
 	self:CreateRemotes(script)
 	if RunService:IsClient() then initClient(self) end
-
-	return self
 end
 
 function initClient(self: Self)
@@ -137,4 +132,4 @@ end
 
 --#endregion
 
-return SettingsService.new()
+return SettingsService.new() :: SettingsService

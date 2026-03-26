@@ -2,16 +2,12 @@ local Base = require("@self/Base")
 local Class = require("../Packages/Class")
 
 local InterfaceController = {}
-InterfaceController.extends = Base
+Class(InterfaceController, Base)
 
 export type InterfaceController = Base.BaseInterfaceController
 
 type Self = InterfaceController
 
-function InterfaceController.new(): InterfaceController
-	local self: Self = Class(InterfaceController, Base.new())
+function InterfaceController.init(self: Self) self:Super():init() end
 
-	return self
-end
-
-return InterfaceController.new()
+return InterfaceController.new() :: InterfaceController

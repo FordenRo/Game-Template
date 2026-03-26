@@ -1,11 +1,10 @@
 --!native
 local Class = require("./Class")
 
-local Meta = {}
 local components = {}
 
 local Component = {}
-Component.extends = Class
+Class(Component)
 
 export type Component<Instance> = {
 	Instance: Instance,
@@ -13,19 +12,7 @@ export type Component<Instance> = {
 
 type Self = Component<Instance>
 
-function Meta.__call<Instance, B, S>(
-	_,
-	instance: Instance,
-	base: B,
-	source: S?
-): Component<Instance> & B & S
-	assert(
-		components[instance] == nil,
-		`{instance.Name} already has a Component`
-	)
-
-	local self: Self = Class(base, source)
-
+function Component.init(self: Self, instance: Instance)
 	self.Instance = instance
 
 	self.Instance.Destroying:Once(
@@ -33,14 +20,14 @@ function Meta.__call<Instance, B, S>(
 	)
 
 	components[self.Instance] = self
-	return self
 end
 
-function Component.new<Instance, S>(
-	instance: Instance,
-	source: S?
-): Component<Instance> & S
-	return Component(instance, { extends = Component }, source)
+function Component.new<Instance>(instance: Instance): Component<Instance>
+	local self: Self = Class.new(Component)
+
+	self:init(instance)
+
+	return self
 end
 
 function Component.getComponent<Instance>(instance: Instance): Component<Instance>?
@@ -54,16 +41,9 @@ function Component.Clone(self: Self)
 	return cloned
 end
 
-setmetatable(Component, Meta)
-
-return table.freeze(Component) :: setmetatable<
-	{
-		--- Creates a new component
-		new: typeof(Component.new),
-		--- Returns `Component` from `Instance` or nil if not exists.
-		getComponent: typeof(Component.getComponent),
-	},
-	{
-		__call: typeof(Meta.__call),
-	}
->
+return table.freeze(Component) :: {
+	--- Creates a new component
+	new: typeof(Component.new),
+	--- Returns `Component` from `Instance` or nil if not exists.
+	getComponent: typeof(Component.getComponent),
+}

@@ -10,7 +10,7 @@ local pcall = pcall
 local math = math
 
 local BitPacket = {}
-BitPacket.extends = Class
+Class(BitPacket)
 
 export type BitPacket<V> = {
 	--- Writes the value to provided BitBuffer.
@@ -35,18 +35,15 @@ type Self = {
 	_read: (bb: BitBuffer) -> any,
 } & BitPacket<any>
 
-function BitPacket.new<V>(
-	write: (bb: BitBuffer, value: V) -> (),
-	read: (bb: BitBuffer) -> V,
+function BitPacket.init(
+	self: Self,
+	write: (bb: BitBuffer, value: any) -> (),
+	read: (bb: BitBuffer) -> any,
 	size: number?
-): BitPacket<V>
-	local self: Self = Class(BitPacket)
-
+)
 	self._write = write
 	self._read = read
 	self.Size = size
-
-	return self
 end
 
 function BitPacket.Write(self: Self, bb: BitBuffer, value: any)
@@ -257,7 +254,11 @@ end
 
 return table.freeze(BitPacket) :: {
 	--- Creates a packet with provided `write` and `read` methods.
-	new: typeof(BitPacket.new),
+	new: <V>(
+		write: (bb: BitBuffer, value: V) -> (),
+		read: (bb: BitBuffer) -> V,
+		size: number?
+	) -> BitPacket<V>,
 
 	Packet: typeof(BitPacket.Packet),
 	--- Unsigned integer packet with size of 8 bits or `bitCount` if provided.

@@ -1,12 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Binding = require("@self/Binding")
+local Class = require("../../../Packages/Class")
 local Component = require("../../../Packages/Component")
 local InputTypes = require("../../../Services/InputService/InputTypes")
 local Trove = require("../../../Packages/Trove")
 
-local ActionBinding = { change = {} }
-ActionBinding.extends = Component
+local ActionBinding = {}
+Class(ActionBinding, Component)
 
 export type ActionBinding = setmetatable<{
 	InputAction: InputAction,
@@ -25,14 +26,12 @@ export type ActionBinding = setmetatable<{
 
 type Self = ActionBinding
 
-function ActionBinding.new(
+function ActionBinding.init(
+	self: Self,
 	inputAction: InputAction,
 	config: InputTypes.BaseAction
-): ActionBinding
-	local self: Self = Component(
-		ReplicatedStorage.UI.Settings.Types.ActionBinding:Clone(),
-		ActionBinding
-	)
+)
+	self:Super():init(ReplicatedStorage.UI.Settings.Types.ActionBinding:Clone())
 
 	self.Config = config
 	self.InputAction = inputAction
@@ -56,11 +55,13 @@ function ActionBinding.new(
 	end
 
 	trove:AttachToInstance(self.Instance)
-	return self
 end
 
 -- function ActionBinding.AddBinding(self: Self) end
 
 return table.freeze(ActionBinding) :: {
-	new: typeof(ActionBinding.new),
+	new: (
+		inputAction: InputAction,
+		config: InputTypes.BaseAction
+	) -> ActionBinding,
 }
