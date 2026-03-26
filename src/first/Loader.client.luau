@@ -29,3 +29,8 @@ for _, service in ReplicatedStorage.Shared.Services:GetChildren() do
 		)
 	end
 end
+
+local InterfaceController =
+	require(ReplicatedStorage.Shared.Controllers.InterfaceController)
+
+InterfaceController.Enabled = true
