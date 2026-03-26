@@ -64,8 +64,6 @@ type Self = {
 type Base = {
 	extends: Base?,
 	implements: { Base }?,
-	onImplemented: (self: Base) -> (),
-	onExtended: (self: Base) -> (),
 	set: { [string]: (self: Base, value: any) -> boolean? }?,
 	get: { [string]: (self: Base) -> any }?,
 	change: { [string]: (self: Base) -> () }?,
@@ -103,20 +101,6 @@ local function callChangeds(self, base: Base, k: string)
 	if base.implements then
 		for _, v in base.implements do
 			callChangeds(self, v, k)
-		end
-	end
-end
-
-local function callInitMethods(self, base: Base)
-	local ext = base.extends
-	if ext then
-		if ext.onExtended then ext.onExtended(self) end
-		callInitMethods(self, ext)
-	end
-	if base.implements then
-		for _, v in base.implements do
-			if v.onImplemented then v.onImplemented(self) end
-			callInitMethods(self, v)
 		end
 	end
 end
