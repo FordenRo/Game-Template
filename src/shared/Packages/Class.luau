@@ -42,7 +42,9 @@ export type Class = {
 	RawSet: (self: Class, key: string, value: any) -> (),
 
 	--- Returns a metatable of the class's parent that this class extends.
-	Super: <Class>(self: Class) -> Class,
+	Super: <Class>(
+		self: Class
+	) -> Class & { init: (self: Class, ...any) -> () },
 
 	--- Returns true if an class's base matches or inherits from a given base.
 	IsA: (self: Class, base: any) -> boolean,
@@ -58,6 +60,7 @@ type Self = {
 	__propChangedSignals: { [string]: Signal.Signal<> },
 	__table: {},
 	__base: Base,
+	__top: Base,
 	init: (...any) -> (),
 } & Class
 
@@ -190,6 +193,7 @@ function Class.Clone(self: Self)
 	return setmetatable({
 		__table = deepClone(self.__table),
 		__base = self.__base,
+		__top = self.__top,
 		__propChangedSignals = deepClone(self.__propChangedSignals),
 		Changed = Signal.new(),
 	}, ClassMeta)
@@ -202,9 +206,13 @@ function Class.RawSet(self: Self, key: string, value: any)
 end
 
 function Class.Super(self: Self)
+	local extends = self.__base.extends or Class
 	return setmetatable({
 		__table = self.__table,
-		__base = self.__base.extends or Class,
+		__base = extends,
+		__top = extends,
+		__propChangedSignals = self.__propChangedSignals,
+		Changed = self.Changed,
 	}, ClassMeta)
 end
 
@@ -229,17 +237,16 @@ function Class.TypeOf(self: Self, base: any) return self.__base == base end
 --#region Metamethods
 
 function Class.__index(self: Self, k: string)
-	local base = self.__base
-
-	local get = getExtendedGetter(base, k)
+	local get = getExtendedGetter(self.__top, k)
 	if get then return get(self) end
 
 	local v = self.__table[k]
-	return if v ~= nil then v else getExtendedValue(base, k)
+	return if v ~= nil then v else getExtendedValue(self.__base, k)
 end
 
 function Class.__newindex(self: Self, k: string, v: any)
-	local set = getExtendedSetter(self.__base, k)
+	local base = self.__top
+	local set = getExtendedSetter(base, k)
 	if set then
 		if not set(self, v) then return end
 	else
@@ -247,7 +254,7 @@ function Class.__newindex(self: Self, k: string, v: any)
 		self.__table[k] = v
 	end
 
-	callChangeds(self, self.__base, k)
+	callChangeds(self, base, k)
 	self.Changed:Fire(k)
 	if self.__propChangedSignals[k] then self.__propChangedSignals[k]:Fire() end
 end
