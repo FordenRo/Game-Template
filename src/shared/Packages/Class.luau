@@ -260,7 +260,10 @@ end
 function Class.__tostring(self: Self)
 	local fields = {}
 	for k, v in self.__table do
-		table.insert(fields, `\t{tostring(k)} = {tostring(v)}`)
+		table.insert(
+			fields,
+			`\t{tostring(k)} = {tostring(v):gsub("\n", "\n\t")}`
+		)
 	end
 	return `Class({table.concat(fields, "\n")})`
 end
