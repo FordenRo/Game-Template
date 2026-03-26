@@ -33,8 +33,8 @@ local CORE_GUI_PROPERTIES = {
 }
 --#endregion
 
-local BaseInterfaceController = { get = {}, set = {}, change = {} }
-BaseInterfaceController.extends = Component
+local BaseInterfaceController = {}
+Class(BaseInterfaceController, Component)
 
 --#region Types
 
@@ -148,19 +148,17 @@ type NotificationProperties = {
 
 --#endregion
 
-function BaseInterfaceController.new(): BaseInterfaceController
+function BaseInterfaceController.init(self: Self)
 	local screen = Instance.new("ScreenGui")
 	screen.Name = "Interface"
 	screen.Enabled = false
 	screen.Parent = Players.LocalPlayer.PlayerGui
 
-	local self: Self = Component(screen, BaseInterfaceController)
+	self:Super():init(screen)
 
 	self.Enabled = false
 
 	self:RawSet("ResetButtonCallback", true)
-
-	return self
 end
 
 function BaseInterfaceController.change.Enabled(self: Self)
@@ -271,5 +269,5 @@ end
 --#endregion
 
 return table.freeze(BaseInterfaceController) :: {
-	new: typeof(BaseInterfaceController.new),
+	new: () -> BaseInterfaceController,
 }
