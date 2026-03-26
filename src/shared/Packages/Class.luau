@@ -58,6 +58,7 @@ type Self = {
 	__propChangedSignals: { [string]: Signal.Signal<> },
 	__table: {},
 	__base: Base,
+	init: (...any) -> (),
 } & Class
 
 type Base = {
@@ -152,18 +153,28 @@ do -- Set meta methods
 	end
 end
 
-function Meta.__call<B, S>(_, base: B, source: S?): S & B & Class
-	local t = source and source.__table or source or {}
+function Meta.__call(_, base: Base, extends: Base?, implements: { Base }?)
+	if not base.change then base.change = {} end
+	if not base.get then base.get = {} end
+	if not base.set then base.set = {} end
+	if extends then base.extends = extends end
+	if implements then base.implements = implements end
 
-	local self: Self = setmetatable({
-		__table = t,
-		__base = base,
-		__propChangedSignals = source and source.__propChangedSignals or {},
-		Changed = source and source.Changed or Signal.new(),
-	}, ClassMeta)
+	function base.new(...)
+		local self: Self = setmetatable({
+			__table = {},
+			__base = base,
+			__top = base,
+			__propChangedSignals = {},
+			Changed = Signal.new(),
+		}, ClassMeta)
 
-	callInitMethods(self, base)
-	return self
+		self:init(...)
+
+		return self
+	end
+
+	return base
 end
 
 function Class.new<S>(source: S?): S & Class
