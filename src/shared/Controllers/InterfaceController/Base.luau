@@ -38,103 +38,100 @@ BaseInterfaceController.extends = Component
 
 --#region Types
 
-export type BaseInterfaceController = setmetatable<
-	{
-		--- Toggles the visibility of the interface.
-		Enabled: boolean,
-		--- TODO: comment
-		CurrentWindow: GuiObject?,
+export type BaseInterfaceController = {
+	--- Toggles the visibility of the interface.
+	Enabled: boolean,
+	--- TODO: comment
+	CurrentWindow: GuiObject?,
 
-		--- Adds `GuiObject` to the interface.
-		Add: (
-			self: BaseInterfaceController,
-			object: Instance | Component.Component<Instance>
-		) -> (),
+	--- Adds `GuiObject` to the interface.
+	Add: (
+		self: BaseInterfaceController,
+		object: Instance | Component.Component<Instance>
+	) -> (),
 
-		--- Returns a list of all `GuiObject` instances occupying the given position on the screen.
-		GetGuiObjectsAtPosition: (
-			self: BaseInterfaceController,
-			position: Vector2
-		) -> { GuiObject },
-		--- Returns a list of all `GuiObject` instances occupying the circle at the given position of the radius.
-		GetGuiObjectsInCircle: (
-			self: BaseInterfaceController,
-			position: Vector2,
-			radius: number
-		) -> { GuiObject },
+	--- Returns a list of all `GuiObject` instances occupying the given position on the screen.
+	GetGuiObjectsAtPosition: (
+		self: BaseInterfaceController,
+		position: Vector2
+	) -> { GuiObject },
+	--- Returns a list of all `GuiObject` instances occupying the circle at the given position of the radius.
+	GetGuiObjectsInCircle: (
+		self: BaseInterfaceController,
+		position: Vector2,
+		radius: number
+	) -> { GuiObject },
 
-		--- Core values ---
+	--- Core values ---
 
-		--- Controls whether the chat is active.
-		ChatActive: boolean,
-		--- Controls whether notifications for earned player points will appear.
-		PointsNotificationActive: boolean,
-		--- Controls whether notifications for earned badges will appear.
-		BadgesNotificationsActive: boolean,
-		--[[
-			Determines whether the topbar is displayed. Disabling the topbar will also disable all CoreGuis such as the chat, inventory, and player list (for example, those set with SetCoreGuiEnabled).
+	--- Controls whether the chat is active.
+	ChatActive: boolean,
+	--- Controls whether notifications for earned player points will appear.
+	PointsNotificationActive: boolean,
+	--- Controls whether notifications for earned badges will appear.
+	BadgesNotificationsActive: boolean,
+	--[[
+		Determines whether the topbar is displayed. Disabling the topbar will also disable all CoreGuis such as the chat, inventory, and player list (for example, those set with SetCoreGuiEnabled).
 
-			When disabled, the region the topbar once occupied will still capture mouse events; however, buttons placed there will not respond to clicks. The origin of GUI space will still be offset 36 pixels from the top of the screen.
-		]]
-		TopbarEnabled: boolean,
-		--- Determines whether the Developer Console is visible.
-		DevConsoleVisible: boolean,
-		--- Determines the behavior, if any, of the reset button given a boolean or a function to be fired when a player requests to reset.
-		ResetButtonCallback: () -> () | boolean,
+		When disabled, the region the topbar once occupied will still capture mouse events; however, buttons placed there will not respond to clicks. The origin of GUI space will still be offset 36 pixels from the top of the screen.
+	]]
+	TopbarEnabled: boolean,
+	--- Determines whether the Developer Console is visible.
+	DevConsoleVisible: boolean,
+	--- Determines the behavior, if any, of the reset button given a boolean or a function to be fired when a player requests to reset.
+	ResetButtonCallback: () -> () | boolean,
 
-		--- Determines whether all available core UIs are enabled.
-		CoreGuiEnabled: boolean,
-		--- Determines whether the text chat window is enabled.
-		ChatEnabled: boolean,
-		--- Determines whether the character's Backpack is enabled.
-		BackpackEnabled: boolean,
-		--- Determines whether the `Avatar Switcher` that allows users to change their platform avatar is enabled.
-		AvatarSwitchedEnabled: boolean,
-		--- Determines whether the "capture" button along the right side of the screen is enabled.
-		CapturesEnabled: boolean,
-		--- Determines whether the dynamically updated Players list, commonly used as a leaderboard is enabled.
-		PlayerListEnabled: boolean,
-		--- Determines whether the popup menu of character emotes is enabled.
-		EmotesMenuEnabled: boolean,
-		--- Determines whether the character's Health bar is enabled.
-		HealthEnabled: boolean,
-		--- Determines whether the player's perspective or view of their own character is enabled.
-		SelfViewEnabled: boolean,
+	--- Determines whether all available core UIs are enabled.
+	CoreGuiEnabled: boolean,
+	--- Determines whether the text chat window is enabled.
+	ChatEnabled: boolean,
+	--- Determines whether the character's Backpack is enabled.
+	BackpackEnabled: boolean,
+	--- Determines whether the `Avatar Switcher` that allows users to change their platform avatar is enabled.
+	AvatarSwitchedEnabled: boolean,
+	--- Determines whether the "capture" button along the right side of the screen is enabled.
+	CapturesEnabled: boolean,
+	--- Determines whether the dynamically updated Players list, commonly used as a leaderboard is enabled.
+	PlayerListEnabled: boolean,
+	--- Determines whether the popup menu of character emotes is enabled.
+	EmotesMenuEnabled: boolean,
+	--- Determines whether the character's Health bar is enabled.
+	HealthEnabled: boolean,
+	--- Determines whether the player's perspective or view of their own character is enabled.
+	SelfViewEnabled: boolean,
 
-		--- Core functions ---
+	--- Core functions ---
 
-		--- Prompts the current player to send a connection request to the given Player.
-		PromptSendFriendRequest: (
-			self: BaseInterfaceController,
-			player: Player
-		) -> (),
-		--- Prompts the current player to remove a given Player from their connections list.
-		PromptUnfriend: (self: BaseInterfaceController, player: Player) -> (),
-		--- Prompts the current player to block the given Player.
-		PromptBlockPlayer: (
-			self: BaseInterfaceController,
-			player: Player
-		) -> (),
-		--- Prompts the current player to unblock the given Player.
-		PromptUnblockPlayer: (
-			self: BaseInterfaceController,
-			player: Player
-		) -> (),
-		--- Causes a non-intrusive notification to appear at the bottom right of the screen. The notification may have up to two buttons.
-		SendNotification: (
-			self: BaseInterfaceController,
-			title: string,
-			text: string,
-			props: NotificationProperties?
-		) -> (),
-	},
-	{ __index: Component.Component<ScreenGui> }
->
+	--- Prompts the current player to send a connection request to the given Player.
+	PromptSendFriendRequest: (
+		self: BaseInterfaceController,
+		player: Player
+	) -> (),
+	--- Prompts the current player to remove a given Player from their connections list.
+	PromptUnfriend: (self: BaseInterfaceController, player: Player) -> (),
+	--- Prompts the current player to block the given Player.
+	PromptBlockPlayer: (
+		self: BaseInterfaceController,
+		player: Player
+	) -> (),
+	--- Prompts the current player to unblock the given Player.
+	PromptUnblockPlayer: (
+		self: BaseInterfaceController,
+		player: Player
+	) -> (),
+	--- Causes a non-intrusive notification to appear at the bottom right of the screen. The notification may have up to two buttons.
+	SendNotification: (
+		self: BaseInterfaceController,
+		title: string,
+		text: string,
+		props: NotificationProperties?
+	) -> (),
+} & Component.Component<ScreenGui>
 
-type Self = setmetatable<{
+type Self = {
 	windowConn: RBXScriptConnection?,
 	lastWindow: GuiObject?,
-}, { __index: BaseInterfaceController }>
+} & BaseInterfaceController
 
 type NotificationProperties = {
 	--- The image to display with the notification.
@@ -273,4 +270,6 @@ for prop, coreGui in CORE_GUI_PROPERTIES do
 end
 --#endregion
 
-return BaseInterfaceController.new()
+return table.freeze(BaseInterfaceController) :: {
+	new: typeof(BaseInterfaceController.new),
+}

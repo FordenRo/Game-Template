@@ -9,7 +9,7 @@ export type InterfaceController = Base.BaseInterfaceController
 type Self = InterfaceController
 
 function InterfaceController.new(): InterfaceController
-	local self: Self = Class(InterfaceController, Base)
+	local self: Self = Class(InterfaceController, Base.new())
 
 	return self
 end
