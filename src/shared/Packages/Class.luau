@@ -148,7 +148,7 @@ function Meta.__call(_, base: Base, extends: Base?, implements: { Base }?)
 	if implements then base.implements = implements end
 
 	function base.new(...)
-		local self: Self = Class(base)
+		local self: Self = Class.new(base)
 		self:init(...)
 		return self
 	end
