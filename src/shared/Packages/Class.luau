@@ -212,7 +212,7 @@ function Class.Super(self: Self)
 	return setmetatable({
 		__table = self.__table,
 		__base = extends,
-		__top = extends,
+		__top = self.__base,
 		__propChangedSignals = self.__propChangedSignals,
 		Changed = self.Changed,
 	}, ClassMeta)
