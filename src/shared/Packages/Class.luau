@@ -243,7 +243,7 @@ function Class.__index(self: Self, k: string)
 	if get then return get(self) end
 
 	local v = self.__table[k]
-	return if v ~= nil then v else getExtendedValue(self.__base, k)
+	return if v ~= nil then v else getExtendedValue(self.__base, k) -- TODO: maybe replace it with self.__top?
 end
 
 function Class.__newindex(self: Self, k: string, v: any)
@@ -266,6 +266,8 @@ function Class.__eq(self: Self, obj: any)
 end
 
 function Class.__tostring(self: Self)
+	if not next(self.__table) then return "Class()" end
+
 	local fields = {}
 	for k, v in self.__table do
 		table.insert(
@@ -273,7 +275,7 @@ function Class.__tostring(self: Self)
 			`\t{tostring(k)} = {tostring(v):gsub("\n", "\n\t")}`
 		)
 	end
-	return `Class({table.concat(fields, "\n")})`
+	return `Class(\n{table.concat(fields, "\n")})`
 end
 
 --#endregion

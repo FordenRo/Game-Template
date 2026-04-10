@@ -188,11 +188,16 @@ function Dictionary.__concat<V, A>(self: Dictionary<V>, obj: { A }): Dictionary<
 end
 
 function Dictionary.__tostring(self: Self)
+	if not next(self.__table) then return "Dictionary()" end
+
 	local fields = {}
-	for k, v in self do
-		table.insert(fields, `{tostring(k)} = {tostring(v)}`)
+	for k, v in self.__table do
+		table.insert(
+			fields,
+			`\t{tostring(k)} = {tostring(v):gsub("\n", "\n\t")}`
+		)
 	end
-	return `Dictionary({table.concat(fields, "\n")})`
+	return `Dictionary(\n{table.concat(fields, "\n")})`
 end
 
 --#endregion
