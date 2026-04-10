@@ -2,7 +2,7 @@ if not game:IsLoaded() then game.Loaded:Wait() end
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local TryCall = require(ReplicatedStorage.Shared.Packages.TryCall)
+local TryCall = require("@game/ReplicatedStorage/Shared/Packages/TryCall")
 
 for _, controller in ReplicatedStorage.Shared.Controllers:GetChildren() do
 	if controller:IsA("ModuleScript") then
@@ -31,6 +31,6 @@ for _, service in ReplicatedStorage.Shared.Services:GetChildren() do
 end
 
 local InterfaceController =
-	require(ReplicatedStorage.Shared.Controllers.InterfaceController)
+	require("@game/ReplicatedStorage/Shared/Controllers/InterfaceController")
 
 InterfaceController.Enabled = true
