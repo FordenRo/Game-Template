@@ -208,7 +208,7 @@ function goto(self: Self, instance: GuiObject)
 end
 
 function SettingsWindow.HighlightSetting(self: Self, value: BaseSettingType)
-	local groups = Array() :: Array.Array<SettingTypes.Group>
+	local groups: Array.Array<SettingTypes.Group> = Array()
 
 	local parent = value.Parent
 	while parent do
@@ -216,9 +216,8 @@ function SettingsWindow.HighlightSetting(self: Self, value: BaseSettingType)
 		parent = parent.Parent
 	end
 	groups = groups:Reversed()
-	local tab = groups:Remove(1)
 
-	self.CurrentTab = tab
+	self.CurrentTab = groups:Remove(1)
 	task.defer(function()
 		for _, groupConfig in groups do
 			local group = self.groups[groupConfig]
