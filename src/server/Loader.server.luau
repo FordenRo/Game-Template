@@ -9,7 +9,9 @@ for _, handler in script.Parent.Handlers:GetChildren() do
 			function() require(handler) end,
 			nil,
 			function(err)
-				debug.traceback(`Error while loading {handler.Name}: {err}`)
+				print(
+					debug.traceback(`Error while loading {handler.Name}: {err}`)
+				)
 			end
 		)
 	end
@@ -22,7 +24,9 @@ for _, service in ReplicatedStorage.Shared.Services:GetChildren() do
 			function() require(service) end,
 			nil,
 			function(err)
-				debug.traceback(`Error while loading {service.Name}: {err}`)
+				print(
+					debug.traceback(`Error while loading {service.Name}: {err}`)
+				)
 			end
 		)
 	end

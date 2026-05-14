@@ -11,7 +11,11 @@ for _, controller in ReplicatedStorage.Shared.Controllers:GetChildren() do
 			function() require(controller) end,
 			nil,
 			function(err)
-				debug.traceback(`Error while loading {controller.Name}: {err}`)
+				print(
+					debug.traceback(
+						`Error while loading {controller.Name}: {err}`
+					)
+				)
 			end
 		)
 	end
@@ -24,7 +28,9 @@ for _, service in ReplicatedStorage.Shared.Services:GetChildren() do
 			function() require(service) end,
 			nil,
 			function(err)
-				debug.traceback(`Error while loading {service.Name}: {err}`)
+				print(
+					debug.traceback(`Error while loading {service.Name}: {err}`)
+				)
 			end
 		)
 	end
